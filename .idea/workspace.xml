@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3321375c-23aa-4c94-8e5a-6bd59df4323e" name="Changes" comment="unv files" />
+    <list default="true" id="3321375c-23aa-4c94-8e5a-6bd59df4323e" name="Changes" comment="f">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -68,7 +70,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "F:/Py_projects/Railway_Revolution"
+    "last_opened_file_path": "F:/Py_projects/Railway_Revolution",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PythonContentEntriesConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -145,7 +148,23 @@
       <option name="project" value="LOCAL" />
       <updated>1711736748840</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="f">
+      <option name="closed" value="true" />
+      <created>1711736928214</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1711736928214</updated>
+    </task>
+    <task id="LOCAL-00006" summary="f">
+      <option name="closed" value="true" />
+      <created>1711737051255</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1711737051255</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -164,6 +183,7 @@
     <MESSAGE value="authorisation" />
     <MESSAGE value="gitignore" />
     <MESSAGE value="unv files" />
-    <option name="LAST_COMMIT_MESSAGE" value="unv files" />
+    <MESSAGE value="f" />
+    <option name="LAST_COMMIT_MESSAGE" value="f" />
   </component>
 </project>
