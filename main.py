@@ -16,6 +16,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+# TODO: найти ненужные части кода
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
