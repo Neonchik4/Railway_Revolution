@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3321375c-23aa-4c94-8e5a-6bd59df4323e" name="Changes" comment="f">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-    </list>
+    <list default="true" id="3321375c-23aa-4c94-8e5a-6bd59df4323e" name="Changes" comment="f" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -164,7 +162,31 @@
       <option name="project" value="LOCAL" />
       <updated>1711737051255</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="f">
+      <option name="closed" value="true" />
+      <created>1711737316849</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1711737316849</updated>
+    </task>
+    <task id="LOCAL-00008" summary="f">
+      <option name="closed" value="true" />
+      <created>1711737478341</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1711737478341</updated>
+    </task>
+    <task id="LOCAL-00009" summary="f">
+      <option name="closed" value="true" />
+      <created>1711737565263</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1711737565263</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
