@@ -18,6 +18,7 @@ login_manager.init_app(app)
 
 # TODO: найти ненужные части кода
 
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -57,7 +58,7 @@ def index():
     return render_template("index.html", news=news)
 
 
-@app.route('/news', methods=['GET', 'POST'])
+@app.route('/add_news', methods=['GET', 'POST'])
 @login_required
 def add_news():
     form = NewsForm()
@@ -75,7 +76,7 @@ def add_news():
                            form=form)
 
 
-@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@app.route('/edit_news/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_news(id):
     form = NewsForm()
