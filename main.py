@@ -16,7 +16,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-# TODO: найти ненужные части кода
+@app.route('/')
+def main_page():
+    return render_template('main_page.html')
 
 
 @login_manager.user_loader
@@ -47,7 +49,7 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route("/")
+@app.route("/news")
 def index():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
