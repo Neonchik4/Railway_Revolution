@@ -8,12 +8,26 @@ from forms.user import RegisterForm, LoginForm
 from data.news import News
 from data import db_session, news_api, news_resources
 from data.users import User
+import sqlite3
 
 app = Flask(__name__)
 api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+con = sqlite3.connect('db/Railway_data.db')
+cursor_sql = con.cursor()
+cursor_sql.execute('')
+
+lines = [i[0] for i in cursor_sql.execute('SELECT name FROM LINES').fetchall()]
+dic_line_to_stations = {i[0]: i[1].split(', ') for i in
+                        cursor_sql.execute('SELECT name, stations FROM LINES').fetchall()}
+RESOURCES = ['Нефтепродукты', "Строительные материалы", "Химическая продукция", "Металлопрокат",
+             "Контейнеры", "Уголь", "Нефть", "Песок", "Глина", "Древесина", "Сталь", "Алюминий", "Зерно", "Сахар",
+             "Мука", "Фрукты", "Овощи", "Мясо", "Рыба", "Молоко",
+             "Яйца", "Ткани", "Одежда", "Обувь", "Мебель", "Электроника", "Автомобили",
+             "Мотоциклы", "Книги", "Бумага", "Пластик", "Стекло", "Керамика",
+             "Лекарства", "Химикаты"]
 
 
 @app.route('/')
