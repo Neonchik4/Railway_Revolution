@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+<div>
+    <div style="display: flex; justify-content: center;">
+        <h1>Покупка поезда</h1>
+    </div>
+    <form class="buying_train_form" method="post">
+        <div class="form-group">
+            <label for="classSelect">Тип поезда:</label>
+            <select class="form-control" id="classSelect" name="train_type">
+                <option value="express">Экспресс</option>
+                <option value="local">Пригородный</option>
+                <option value="freight">Грузовой</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="classSelect">Выберите линию:</label>
+            <select class="form-control" id="lineSelect" name="line">
+                {% for line in lines %}
+                <option value="{{ line }}">{{ line }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="classSelect">Выберите станцию отправления:</label>
+            <select class="form-control" id="stationFromSelect" name="station1">
+                {% for station in stations %}
+                <option value="{{ station }}">{{ station }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="classSelect">Выберите конечную станцию:</label>
+            <select class="form-control" id="stationToSelect" name="station1">
+                {% for station in stations %}
+                <option value="{{ station }}">{{ station }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="acceptRules" name="accept" onchange="toggleButton()">
+            <label class="form-check-label" for="acceptRules">Я подтверждаю покупку</label>
+        </div>
+
+        <button type="submit" class="btn btn-success" id="buyButton" style="display: none">Купить поезд</button>
+
+        <script>
+            function toggleButton() {
+                var checkbox = document.getElementById('acceptRules');
+                var button = document.getElementById('buyButton');
+
+                if (checkbox.checked) {
+                    button.style.display = 'block';
+                } else {
+                    button.style.display = 'none';
+                }
+            }
+        </script>
+    </form>
+</div>
+</body>
+{% endblock %}

@@ -48,6 +48,16 @@ def resources():
     return render_template('resources.html', resources=RESOURCES)
 
 
+@app.route('/buying_train', methods=['GET', "POST"])
+def buying_train():
+    if request.method == 'GET':
+        params = {}
+        return render_template('buying_train.html', **params)
+    elif request.method == 'POST':
+        params = {}
+        return render_template('result_buying_train.html', **params)
+
+
 @app.route
 @login_manager.user_loader
 def load_user(user_id):
