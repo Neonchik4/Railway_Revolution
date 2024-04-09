@@ -63,25 +63,25 @@
         </script>
 
         <div class="slider">
-            <output for="fader" id="volume">0</output>
-            <input type="range" id="fader" min="0" max="300" value="0" step="1" oninput="outputUpdate(value)">
+            <output for="fader" id="volume">10</output>
+            <input type="range" id="fader" min="10" max="450" value="0" step="1" oninput="outputUpdate(value)">
         </div>
         <script type="text/javascript">
             function outputUpdate(vol) {
                 var output = document.querySelector('#volume');
                 output.value = vol;
-                output.style.left = vol - 20 + 'px';
-                if(output.value > 9) {
-                    output.style.left = vol - 30 + 'px';
-                }
+                output.style.left = vol - 30 + 'px';
                 if(output.value > 99) {
-                    output.style.left = vol - 45 + 'px';
+                    output.style.left = vol - 60 + 'px';
                 }
                 if(output.value > 199) {
-                    output.style.left = vol - 53 + 'px';
+                    output.style.left = vol - 75 + 'px';
                 }
                 if(output.value >= 299) {
-                    output.style.left = vol - 61 + 'px';
+                    output.style.left = vol - 90 + 'px';
+                }
+                if(output.value >= 399) {
+                    output.style.left = vol - 105 + 'px';
                 }
             }
         </script>
