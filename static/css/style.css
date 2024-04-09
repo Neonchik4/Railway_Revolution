@@ -1,13 +1,10 @@
 h1 {
     font-size: 40px;
 }
-#shapka_div {
-    display: flex;
-    justify-content: center;
-    padding-top: 5px;
-    padding-bottom: auto;
+#res_div {
+    font-size: 20px;
 }
-#shapka_div1 {
+#shapka_div {
     display: flex;
     justify-content: center;
     padding-top: 5px;

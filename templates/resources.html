@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <body>
+        <h1>Список Ресурсов</h1>
+        <ul>
+            {% for res in resources %}
+            <li><div id="res_div">{{ res }}</div></li>
+            {% endfor %}
+        </ul>
+    </body>
+{% endblock %}
