@@ -50,10 +50,11 @@ def resources():
 
 @app.route('/buying_train', methods=['GET', "POST"])
 def buying_train():
-    if request.method == 'GET':
+    if request.method == 'GET':  # TODO
         params = {}
         return render_template('buying_train.html', **params)
     elif request.method == 'POST':
+        print(request.form)
         params = {}
         return render_template('result_buying_train.html', **params)
 

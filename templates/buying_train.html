@@ -5,6 +5,7 @@
     <div style="display: flex; justify-content: center;">
         <h1>Покупка поезда</h1>
     </div>
+
     <form class="buying_train_form" method="post">
         <div class="form-group">
             <label for="classSelect">Тип поезда:</label>
@@ -48,7 +49,6 @@
         </div>
 
         <button type="submit" class="btn btn-success" id="buyButton" style="display: none">Купить поезд</button>
-
         <script>
             function toggleButton() {
                 var checkbox = document.getElementById('acceptRules');
@@ -61,6 +61,19 @@
                 }
             }
         </script>
+
+        <div class="slider">
+            <output for="fader" id="volume"></output>
+            <input type="range" id="fader" min="0" max="300" value="0" step="1" oninput="outputUpdate(value)">
+        </div>
+        <script type="text/javascript">
+            function outputUpdate(vol) {
+                var output = document.querySelector('#volume');
+                output.value = vol;
+                output.style.left = vol - 20 + 'px';
+            }
+        </script>
+
     </form>
 </div>
 </body>
