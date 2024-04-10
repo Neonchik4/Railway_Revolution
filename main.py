@@ -43,11 +43,6 @@ def main_page():
     return render_template('main_page.html')
 
 
-@app.route('/temp')
-def temp():
-    return render_template('tempr.html')
-
-
 @app.route('/resources')
 def resources():
     if current_user.is_authenticated:
