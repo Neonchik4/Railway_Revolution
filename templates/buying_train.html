@@ -32,7 +32,7 @@
         <div class="form-group">
             <label for="lineSelect">Выберите линию:</label>
             <select class="form-control" id="lineSelect" name="line"
-                    onchange="updateSecondSelect(); updateThirdSelect();">
+                    onchange="updateSecondSelect(); updateThirdSelect(); checkDuplicateSelection(); toggleButton();">
                 {% for line in lines %}
                 <option value="{{ line }}">{{ line }}</option>
                 {% endfor %}
