@@ -45,7 +45,11 @@ def main_page():
 
 @app.route('/resources')
 def resources():
-    return render_template('resources.html', resources=RESOURCES)
+    if current_user.is_authenticated:
+        is_authenticated = True
+    else:
+        is_authenticated = False
+    return render_template('resources.html', resources=RESOURCES, is_authenticated=is_authenticated)
 
 
 @app.route('/buying_train', methods=['GET', "POST"])
