@@ -43,6 +43,11 @@ def main_page():
     return render_template('main_page.html')
 
 
+@app.route('/temp')
+def temp():
+    return render_template('tempr.html')
+
+
 @app.route('/resources')
 def resources():
     if current_user.is_authenticated:
@@ -55,11 +60,10 @@ def resources():
 @app.route('/buying_train', methods=['GET', "POST"])
 def buying_train():
     if request.method == 'GET':  # TODO
-        params = {}
+        params = {"lines": lines, "line_to_stations": dic_line_to_stations}
         return render_template('buying_train.html', **params)
     elif request.method == 'POST':
-        print(request.form)
-        params = {}
+        params = dict(request.form)
         return render_template('result_buying_train.html', **params)
 
 
