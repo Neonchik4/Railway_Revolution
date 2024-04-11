@@ -54,9 +54,14 @@ def resources():
 
 @app.route('/buying_train', methods=['GET', "POST"])
 def buying_train():
+    if current_user.is_authenticated:
+        is_authenticated = True
+    else:
+        is_authenticated = False
+
     if request.method == 'GET':  # TODO
         params = {"lines": lines, "line_to_stations": dic_line_to_stations}
-        return render_template('buying_train.html', **params)
+        return render_template('buying_train.html', **params, is_authenticated=is_authenticated)
     elif request.method == 'POST':
         params = dict(request.form)
         return render_template('result_buying_train.html', **params)
