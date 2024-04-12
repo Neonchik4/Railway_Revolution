@@ -15,13 +15,14 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-con = sqlite3.connect('db/Railway_data.db')
-cursor_sql = con.cursor()
-cursor_sql.execute('')
+con1 = sqlite3.connect('db/Railway_data.db')
+con2 = sqlite3.connect('db/blogs.db')
+cursor_sql1 = con1.cursor()
+cursor_sql2 = con2.cursor()
 
-lines = [i[0] for i in cursor_sql.execute('SELECT name FROM LINES').fetchall()]
+lines = [i[0] for i in cursor_sql1.execute('SELECT name FROM LINES').fetchall()]
 dic_line_to_stations = {i[0]: i[1].split(', ') for i in
-                        cursor_sql.execute('SELECT name, stations FROM LINES').fetchall()}
+                        cursor_sql1.execute('SELECT name, stations FROM LINES').fetchall()}
 RESOURCES = ['Нефтепродукты', "Строительные материалы", "Химическая продукция", "Металлопрокат",
              "Контейнеры", "Уголь", "Нефть", "Песок", "Глина", "Древесина", "Сталь", "Алюминий", "Зерно", "Сахар",
              "Мука", "Фрукты", "Овощи", "Мясо", "Рыба", "Молоко",
@@ -201,7 +202,7 @@ def edit_news(id):
 @login_required
 def news_delete(id):
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.id == id,
+    news = db_sess.query(News).filter(News.id == id, News.user_id != 7,
                                       News.user == current_user
                                       ).first()
     if news:
