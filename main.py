@@ -139,10 +139,9 @@ def login():
 def index():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        news = db_sess.query(News).filter(
-            (News.user == current_user) | (News.is_private != True))
+        news = db_sess.query(News)
     else:
-        news = db_sess.query(News).filter(News.is_private != True)
+        news = db_sess.query(News)
     return render_template("index.html", news=news)
 
 
@@ -159,7 +158,7 @@ def add_news():
         current_user.news.append(news)
         db_sess.merge(current_user)
         db_sess.commit()
-        return redirect('/')
+        return redirect('/news')
     return render_template('news.html', title='Добавление новости',
                            form=form)
 
@@ -189,7 +188,7 @@ def edit_news(id):
             news.content = form.content.data
             news.is_private = form.is_private.data
             db_sess.commit()
-            return redirect('/')
+            return redirect('/news')
         else:
             abort(404)
     return render_template('news.html',
@@ -210,7 +209,7 @@ def news_delete(id):
         db_sess.commit()
     else:
         abort(404)
-    return redirect('/')
+    return redirect('/news')
 
 
 @app.route('/register', methods=['GET', 'POST'])
