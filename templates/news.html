@@ -1,29 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ title }}</h1>
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.title.label }}<br>
-        {{ form.title(class="form-control") }}<br>
-        {% for error in form.title.errors %}
-    <p class="alert alert-danger" role="alert">
-        {{ error }}
-    </p>
-    {% endfor %}
-    </p>
-    <p>
-        {{ form.content.label }}<br>
-        {{ form.content(class="form-control") }}<br>
-        {% for error in form.content.errors %}
-    <p content="alert alert-danger" role="alert">
-        {{ error }}
-    </p>
-    {% endfor %}
-    </p>
-    <p>{{ form.is_private() }} {{ form.is_private.label }}</p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    {{message}}
-</form>
+<h1>Записи в блоге</h1>
+{% if current_user.is_authenticated %}
+<a href="/add_news" class="btn btn-secondary">Добавить новость</a>
+{% endif %}
+{% for item in news%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.content}}
+    </div>
+    <div>
+        Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
+    </div>
+    {% if current_user.is_authenticated and current_user == item.user %}
+    <div>
+        <a href="/edit_news/{{ item.id }}" class="btn btn-warning">
+            Изменить
+        </a>
+        <a href="/news_delete/{{ item.id }}" class="btn btn-danger">
+            Удалить
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
 {% endblock %}

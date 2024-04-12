@@ -127,13 +127,13 @@ def login():
 
 
 @app.route("/news")
-def index():
+def news():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        news = db_sess.query(News)
+        news = db_sess.query(News).filter(News.is_private != 1)
     else:
-        news = db_sess.query(News)
-    return render_template("index.html", **CONST_PARAMS, news=news, title='Новости')
+        news = db_sess.query(News).filter(News.is_private != 1)
+    return render_template("news.html", **CONST_PARAMS, news=news, title='Новости')
 
 
 @app.route('/add_news', methods=['GET', 'POST'])
@@ -150,7 +150,7 @@ def add_news():
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/news')
-    return render_template('news.html', title='Добавление новости', **CONST_PARAMS,
+    return render_template('add_news.html', title='Добавление новости', **CONST_PARAMS,
                            form=form)
 
 
