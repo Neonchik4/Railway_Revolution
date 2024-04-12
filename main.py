@@ -37,10 +37,34 @@ resources_weight = {
     "Одежда": 500, "Обувь": 400, "Мебель": 600, "Электроника": 200, "Автомобили": 1500, "Мотоциклы": 300,
     "Книги": 200, "Бумага": 400, "Пластик": 500, "Стекло": 700, "Керамика": 600, "Лекарства": 300, "Химикаты": 400}
 
+# $
+LASTOCHKA_PRICE = 65000
+IVOLGA_PRICE = 85000
+LOCOMOTIVE_PRICE = 60000
+# вместимость в кол-ве людей
+LASTOCHKA_PLACES = 1100
+IVOLGA_PLACES = 2550
+# вместимость в вагонах
+LOCOMOTIVE_LIFTIONG_CAPACITY = 20
+
 
 @app.route('/')
 def main_page():
     return render_template('main_page.html')
+
+
+@app.route('/train_info')
+def train_info():
+    if current_user.is_authenticated:
+        is_authenticated = True
+    else:
+        is_authenticated = False
+
+    return render_template('train_info.html', is_authenticated=is_authenticated,
+                           lastochka_price=LASTOCHKA_PRICE, ivolga_price=IVOLGA_PRICE,
+                           locomotive_price=LOCOMOTIVE_PRICE, lastochka_places=LASTOCHKA_PLACES,
+                           ivolga_places=IVOLGA_PLACES,
+                           locomotive_lifting_capacity=LOCOMOTIVE_LIFTIONG_CAPACITY)
 
 
 @app.route('/resources')
