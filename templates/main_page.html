@@ -1,5 +1,14 @@
 {% extends "base.html" %}
-
 {% block content %}
-    <h1>Добро пожаловать!</h1>
+<body>
+<style>
+    .main_page_container {
+      display: flex;
+      justify-content: center;
+    }
+</style>
+<div class="main_page_container">
+    <h1>Добро пожаловать, {{ current_user.name }}!</h1>
+</div>
+</body>
 {% endblock %}
