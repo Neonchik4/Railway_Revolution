@@ -6,9 +6,9 @@
 <a href="/add_news" class="btn btn-secondary">Добавить новость</a>
 {% endif %}
 {% for item in news%}
-<div class="col-md6 border rounded">
+<div class="col-md6 border rounded" style="margin-top: 8px;">
     <h2>{{item.title}}</h2>
-    <div>
+    <div style="font-size: 21px; padding-bottom: 3px;">
         {{item.content}}
     </div>
     <div>
