@@ -38,7 +38,7 @@ resources_weight = {
     "Одежда": 500, "Обувь": 400, "Мебель": 600, "Электроника": 200, "Автомобили": 1500, "Мотоциклы": 300,
     "Книги": 200, "Бумага": 400, "Пластик": 500, "Стекло": 700, "Керамика": 600, "Лекарства": 300, "Химикаты": 400}
 
-# $
+# цены в $
 LASTOCHKA_PRICE = 65000
 IVOLGA_PRICE = 85000
 LOCOMOTIVE_PRICE = 60000
@@ -52,6 +52,11 @@ LOCOMOTIVE_LIFTIONG_CAPACITY = 20
 @app.route('/')
 def main_page():
     return render_template('main_page.html')
+
+
+@app.route('/scheme')
+def scheme():
+    return render_template('scheme.html')
 
 
 @app.route('/train_info')
