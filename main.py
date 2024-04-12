@@ -83,12 +83,27 @@ def buying_train():
     else:
         is_authenticated = False
 
-    if request.method == 'GET':  # TODO
+    if request.method == 'GET':
         params = {"lines": lines, "line_to_stations": dic_line_to_stations}
         return render_template('buying_train.html', **params, is_authenticated=is_authenticated)
-    elif request.method == 'POST':
+    elif request.method == 'POST':  # TODO: сделать отнятие денег у покупателя
         params = dict(request.form)
-        return render_template('result_buying_train.html', **params)
+        train_type = params['train_type']
+        # Заметка: переводим тип поезда в кириллицу
+        if train_type == 'express':
+            train_type = 'Экспресс'
+        elif train_type == 'local':
+            train_type = 'Пригородный'
+        else:
+            train_type = 'Грузовой'
+
+        line = params['line']
+        station1 = params['station1']
+        station2 = params['station2']
+        trip_cost = params['trip_cost']
+        return render_template('result_buying_train.html', train_type=train_type, line=line,
+                               station1=station1,
+                               station2=station2, trip_cost=trip_cost)
 
 
 @app.route
