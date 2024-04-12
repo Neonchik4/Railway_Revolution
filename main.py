@@ -15,48 +15,31 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-con1 = sqlite3.connect('db/Railway_data.db')
-con2 = sqlite3.connect('db/blogs.db')
-cursor_sql1 = con1.cursor()
-cursor_sql2 = con2.cursor()
 
-lines = [i[0] for i in cursor_sql1.execute('SELECT name FROM LINES').fetchall()]
-dic_line_to_stations = {i[0]: i[1].split(', ') for i in
-                        cursor_sql1.execute('SELECT name, stations FROM LINES').fetchall()}
-RESOURCES = ['Нефтепродукты', "Строительные материалы", "Химическая продукция", "Металлопрокат",
-             "Контейнеры", "Уголь", "Нефть", "Песок", "Глина", "Древесина", "Сталь", "Алюминий", "Зерно", "Сахар",
-             "Мука", "Фрукты", "Овощи", "Мясо", "Рыба", "Молоко",
-             "Яйца", "Ткани", "Одежда", "Обувь", "Мебель", "Электроника", "Автомобили",
-             "Мотоциклы", "Книги", "Бумага", "Пластик", "Стекло", "Керамика",
-             "Лекарства", "Химикаты"]
-# ресурсы и вес единицы этого ресурса в кг || ВРЯД ЛИ ЭТО ПРИГОДИТСЯ
-resources_weight = {
-    'Нефтепродукты': 500, "Строительные материалы": 1000, "Химическая продукция": 300, "Металлопрокат": 700,
-    "Контейнеры": 200, "Уголь": 600, "Нефть": 800, "Песок": 1200, "Глина": 1000,
-    "Древесина": 500, "Сталь": 900, "Алюминий": 400, "Зерно": 600, "Сахар": 300,
-    "Мука": 400, "Фрукты": 200, "Овощи": 300, "Мясо": 500, "Рыба": 400, "Молоко": 1000, "Яйца": 200, "Ткани": 300,
-    "Одежда": 500, "Обувь": 400, "Мебель": 600, "Электроника": 200, "Автомобили": 1500, "Мотоциклы": 300,
-    "Книги": 200, "Бумага": 400, "Пластик": 500, "Стекло": 700, "Керамика": 600, "Лекарства": 300, "Химикаты": 400}
 
-# цены в $
-LASTOCHKA_PRICE = 65000
-IVOLGA_PRICE = 85000
-LOCOMOTIVE_PRICE = 60000
-# вместимость в кол-ве людей
-LASTOCHKA_PLACES = 1100
-IVOLGA_PLACES = 2550
-# вместимость в вагонах
-LOCOMOTIVE_LIFTIONG_CAPACITY = 20
+class Company:
+    def __init__(self):
+        self.money = 10000000
+
+    def money_beautiful_format(self):
+        # красивый ответ -> ans
+        ans = ""
+        for i in range(len(str(self.money)[::-1])):
+            ans += str(self.money)[::-1][i]
+            if i != 0 and (i + 1) % 3 == 0 and i != len(str(self.money)[::-1]) - 1:
+                ans += '.'
+        # возвращаем развернутый ans
+        return ans[::-1] + '$'
 
 
 @app.route('/')
 def main_page():
-    return render_template('main_page.html')
+    return render_template('main_page.html', **CONST_PARAMS, title='Главная')
 
 
 @app.route('/scheme')
 def scheme():
-    return render_template('scheme.html')
+    return render_template('scheme.html', **CONST_PARAMS, title='Схема')
 
 
 @app.route('/train_info')
@@ -66,10 +49,10 @@ def train_info():
     else:
         is_authenticated = False
 
-    return render_template('train_info.html', is_authenticated=is_authenticated,
+    return render_template('train_info.html', **CONST_PARAMS, is_authenticated=is_authenticated,
                            lastochka_price=LASTOCHKA_PRICE, ivolga_price=IVOLGA_PRICE,
                            locomotive_price=LOCOMOTIVE_PRICE, lastochka_places=LASTOCHKA_PLACES,
-                           ivolga_places=IVOLGA_PLACES,
+                           ivolga_places=IVOLGA_PLACES, title='Характеристика поездов',
                            locomotive_lifting_capacity=LOCOMOTIVE_LIFTIONG_CAPACITY)
 
 
@@ -79,7 +62,8 @@ def resources():
         is_authenticated = True
     else:
         is_authenticated = False
-    return render_template('resources.html', resources=RESOURCES, is_authenticated=is_authenticated)
+    return render_template('resources.html', **CONST_PARAMS, resources=RESOURCES,
+                           is_authenticated=is_authenticated, title='Виды ресурсов')
 
 
 @app.route('/buying_train', methods=['GET', "POST"])
@@ -90,8 +74,9 @@ def buying_train():
         is_authenticated = False
 
     if request.method == 'GET':
-        params = {"lines": lines, "line_to_stations": dic_line_to_stations}
-        return render_template('buying_train.html', **params, is_authenticated=is_authenticated)
+        params = {"lines": LINES, "line_to_stations": dic_line_to_stations}
+        return render_template('buying_train.html', **params, **CONST_PARAMS,
+                               is_authenticated=is_authenticated, title='Покупка поезда')
     elif request.method == 'POST':  # TODO: сделать отнятие денег у покупателя
         params = dict(request.form)
         train_type = params['train_type']
@@ -108,7 +93,7 @@ def buying_train():
         station2 = params['station2']
         trip_cost = params['trip_cost']
         return render_template('result_buying_train.html', train_type=train_type, line=line,
-                               station1=station1,
+                               station1=station1, **CONST_PARAMS, title='Покупка поезда',
                                station2=station2, trip_cost=trip_cost)
 
 
@@ -135,10 +120,10 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('login.html',
+        return render_template('login.html', **CONST_PARAMS,
                                message="Неправильный логин или пароль",
-                               form=form)
-    return render_template('login.html', title='Авторизация', form=form)
+                               form=form, title=":(")
+    return render_template('login.html', title='Авторизация', form=form, **CONST_PARAMS)
 
 
 @app.route("/news")
@@ -148,7 +133,7 @@ def index():
         news = db_sess.query(News)
     else:
         news = db_sess.query(News)
-    return render_template("index.html", news=news)
+    return render_template("index.html", **CONST_PARAMS, news=news, title='Новости')
 
 
 @app.route('/add_news', methods=['GET', 'POST'])
@@ -165,7 +150,7 @@ def add_news():
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/news')
-    return render_template('news.html', title='Добавление новости',
+    return render_template('news.html', title='Добавление новости', **CONST_PARAMS,
                            form=form)
 
 
@@ -197,7 +182,7 @@ def edit_news(id):
             return redirect('/news')
         else:
             abort(404)
-    return render_template('news.html',
+    return render_template('news.html', **CONST_PARAMS,
                            title='Редактирование новости',
                            form=form
                            )
@@ -224,12 +209,12 @@ def reqister():
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
-                                   form=form,
+                                   form=form, **CONST_PARAMS,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация',
-                                   form=form,
+                                   form=form, **CONST_PARAMS,
                                    message="Такой пользователь уже есть")
         user = User(
             name=form.name.data,
@@ -240,7 +225,7 @@ def reqister():
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('register.html', title='Регистрация', form=form, **CONST_PARAMS)
 
 
 @app.errorhandler(404)
@@ -263,6 +248,43 @@ def main():
     api.add_resource(news_resources.NewsResource, '/api/v2/news/<int:news_id>')
     app.run()
 
+
+company = Company()
+
+con1 = sqlite3.connect('db/Railway_data.db')
+con2 = sqlite3.connect('db/blogs.db')
+cursor_sql1 = con1.cursor()
+cursor_sql2 = con2.cursor()
+
+LINES = [i[0] for i in cursor_sql1.execute('SELECT name FROM LINES').fetchall()]
+dic_line_to_stations = {i[0]: i[1].split(', ') for i in
+                        cursor_sql1.execute('SELECT name, stations FROM LINES').fetchall()}
+
+RESOURCES = ['Нефтепродукты', "Строительные материалы", "Химическая продукция", "Металлопрокат",
+             "Контейнеры", "Уголь", "Нефть", "Песок", "Глина", "Древесина", "Сталь", "Алюминий", "Зерно", "Сахар",
+             "Мука", "Фрукты", "Овощи", "Мясо", "Рыба", "Молоко",
+             "Яйца", "Ткани", "Одежда", "Обувь", "Мебель", "Электроника", "Автомобили",
+             "Мотоциклы", "Книги", "Бумага", "Пластик", "Стекло", "Керамика",
+             "Лекарства", "Химикаты"]
+# ресурсы и вес единицы этого ресурса в кг || ВРЯД ЛИ ЭТО ПРИГОДИТСЯ
+resources_weight = {
+    'Нефтепродукты': 500, "Строительные материалы": 1000, "Химическая продукция": 300, "Металлопрокат": 700,
+    "Контейнеры": 200, "Уголь": 600, "Нефть": 800, "Песок": 1200, "Глина": 1000,
+    "Древесина": 500, "Сталь": 900, "Алюминий": 400, "Зерно": 600, "Сахар": 300,
+    "Мука": 400, "Фрукты": 200, "Овощи": 300, "Мясо": 500, "Рыба": 400, "Молоко": 1000, "Яйца": 200, "Ткани": 300,
+    "Одежда": 500, "Обувь": 400, "Мебель": 600, "Электроника": 200, "Автомобили": 1500, "Мотоциклы": 300,
+    "Книги": 200, "Бумага": 400, "Пластик": 500, "Стекло": 700, "Керамика": 600, "Лекарства": 300, "Химикаты": 400}
+
+# цены в $
+LASTOCHKA_PRICE = 65000
+IVOLGA_PRICE = 85000
+LOCOMOTIVE_PRICE = 60000
+# вместимость в кол-ве людей
+LASTOCHKA_PLACES = 1100
+IVOLGA_PLACES = 2550
+# вместимость в вагонах
+LOCOMOTIVE_LIFTIONG_CAPACITY = 20
+CONST_PARAMS = {'money': company.money_beautiful_format()}
 
 if __name__ == '__main__':
     main()

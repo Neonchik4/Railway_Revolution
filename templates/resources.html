@@ -3,7 +3,7 @@
 {% block content %}
     <body>
         {% if is_authenticated %}
-            <h1>Список Ресурсов</h1>
+            <h1>Виды ресурсов</h1>
             <ul>
                 {% for res in resources %}
                 <li><div id="res_div">{{ res }}</div></li>
