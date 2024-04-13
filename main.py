@@ -239,7 +239,8 @@ def bad_request(_):
 
 
 def main():
-    db_session.global_init("db/blogs.db")
+    db_session.global_init("db/Railway_data.db")
+
     app.register_blueprint(news_api.blueprint)
     # для списка объектов
     api.add_resource(news_resources.NewsListResource, '/api/v2/news')
@@ -252,9 +253,7 @@ def main():
 company = Company()
 
 con1 = sqlite3.connect('db/Railway_data.db')
-con2 = sqlite3.connect('db/blogs.db')
 cursor_sql1 = con1.cursor()
-cursor_sql2 = con2.cursor()
 
 LINES = [i[0] for i in cursor_sql1.execute('SELECT name FROM LINES').fetchall()]
 dic_line_to_stations = {i[0]: i[1].split(', ') for i in
