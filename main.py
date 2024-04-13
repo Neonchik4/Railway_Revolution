@@ -17,6 +17,17 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+def maker_money_beautiful_format(number):
+    # красивый ответ -> ans
+    ans = ""
+    for i in range(len(str(number)[::-1])):
+        ans += str(number)[::-1][i]
+        if i != 0 and (i + 1) % 3 == 0 and i != len(str(number)[::-1]) - 1:
+            ans += '.'
+    # возвращаем развернутый ans
+    return ans[::-1]
+
+
 class Company:
     def __init__(self):
         self.money = 10000000
@@ -283,7 +294,11 @@ LASTOCHKA_PLACES = 1100
 IVOLGA_PLACES = 2550
 # вместимость в вагонах
 LOCOMOTIVE_LIFTIONG_CAPACITY = 20
-CONST_PARAMS = {'money': company.money_beautiful_format()}
+CONST_PARAMS = {'money': company.money_beautiful_format(),
+                'lastochka_price': maker_money_beautiful_format(LASTOCHKA_PRICE),
+                'ivolga_price': maker_money_beautiful_format(IVOLGA_PRICE),
+                'locomotive_price': maker_money_beautiful_format(LOCOMOTIVE_PRICE)}
+
 
 if __name__ == '__main__':
     main()

@@ -22,13 +22,31 @@
 
     <form class="buying_train_form" method="post">
         <div class="form-group">
-            <label for="classSelect">Тип поезда:</label>
-            <select class="form-control" id="classSelect" name="train_type">
+            <label for="trainTypeSelect">Тип поезда:</label>
+            <select class="form-control" id="trainTypeSelect" name="train_type" onchange="showText();">
                 <option value="express">Экспресс</option>
                 <option value="local">Пригородный</option>
                 <option value="freight">Грузовой</option>
             </select>
         </div>
+
+        <div class="alert alert-dark" role="alert" id="price" style="margin-bottom: 5px;">
+            Стоимость поезда: {{ lastochka_price }}$
+        </div>
+        <script>
+            function showText() {
+              var selectValue = document.getElementById("trainTypeSelect").value;
+              var textToShow = document.getElementById("price");
+
+              if (selectValue === "express") {
+                textToShow.textContent = "Стоимость: " + "{{ lastochka_price }}" + "$";
+              } else if (selectValue === "local") {
+                textToShow.textContent = "Стоимость: " + "{{ ivolga_price }}" + "$";
+              } else if (selectValue === "freight") {
+                textToShow.textContent = "Стоимость: " + "{{ locomotive_price }}" + "$";
+              }
+            }
+        </script>
 
         <div class="form-group">
             <label for="lineSelect">Выберите линию:</label>
