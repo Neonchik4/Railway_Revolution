@@ -182,10 +182,9 @@ def edit_news(id):
             return redirect('/news')
         else:
             abort(404)
-    return render_template('news.html', **CONST_PARAMS,
+    return render_template('add_news.html', **CONST_PARAMS,
                            title='Редактирование новости',
-                           form=form
-                           )
+                           form=form)
 
 
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
@@ -199,7 +198,8 @@ def news_delete(id):
         db_sess.delete(news)
         db_sess.commit()
     else:
-        abort(404)
+        # abort(404)
+        return redirect('/news')
     return redirect('/news')
 
 
