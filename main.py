@@ -9,6 +9,7 @@ from data.news import News
 from data import db_session, news_api, news_resources
 from data.users import User
 import sqlite3
+import pygame
 
 app = Flask(__name__)
 api = Api(app)
@@ -28,9 +29,13 @@ def maker_money_beautiful_format(number):
     return ans[::-1]
 
 
+def update_money():
+    CONST_PARAMS['money'] = company.money_beautiful_format()
+
+
 class Company:
     def __init__(self):
-        self.money = 10000000
+        self.money = 70000000  # TODO: Сделать сохранение в БД
 
     def money_beautiful_format(self):
         # красивый ответ -> ans
@@ -59,10 +64,8 @@ def train_info():
         is_authenticated = True
     else:
         is_authenticated = False
-
     return render_template('train_info.html', **CONST_PARAMS, is_authenticated=is_authenticated,
-                           lastochka_price=LASTOCHKA_PRICE, ivolga_price=IVOLGA_PRICE,
-                           locomotive_price=LOCOMOTIVE_PRICE, lastochka_places=LASTOCHKA_PLACES,
+                           lastochka_places=LASTOCHKA_PLACES,
                            ivolga_places=IVOLGA_PLACES, title='Характеристика поездов',
                            locomotive_lifting_capacity=LOCOMOTIVE_LIFTIONG_CAPACITY)
 
@@ -88,17 +91,23 @@ def buying_train():
         params = {"lines": LINES, "line_to_stations": dic_line_to_stations}
         return render_template('buying_train.html', **params, **CONST_PARAMS,
                                is_authenticated=is_authenticated, title='Покупка поезда')
-    elif request.method == 'POST':  # TODO: сделать отнятие денег у покупателя
+    elif request.method == 'POST':
         params = dict(request.form)
+        print(params)
         train_type = params['train_type']
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
+            company.money -= LASTOCHKA_PRICE
             train_type = 'Экспресс'
         elif train_type == 'local':
+            company.money -= IVOLGA_PRICE
             train_type = 'Пригородный'
         else:
+            company.money -= LOCOMOTIVE_PRICE
             train_type = 'Грузовой'
 
+        update_money()
+        print(CONST_PARAMS)
         line = params['line']
         station1 = params['station1']
         station2 = params['station2']
@@ -298,7 +307,6 @@ CONST_PARAMS = {'money': company.money_beautiful_format(),
                 'lastochka_price': maker_money_beautiful_format(LASTOCHKA_PRICE),
                 'ivolga_price': maker_money_beautiful_format(IVOLGA_PRICE),
                 'locomotive_price': maker_money_beautiful_format(LOCOMOTIVE_PRICE)}
-
 
 if __name__ == '__main__':
     main()
