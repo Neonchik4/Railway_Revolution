@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
+<head>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </symbol>
+        <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </symbol>
+        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+    </svg>
+</head>
 <body>
+{% if is_authenticated %}
 <div>
     <div style="display: flex; justify-content: center;">
         <h1>Покупка поезда</h1>
@@ -8,63 +22,123 @@
 
     <form class="buying_train_form" method="post">
         <div class="form-group">
-            <label for="classSelect">Тип поезда:</label>
-            <select class="form-control" id="classSelect" name="train_type">
+            <label for="trainTypeSelect">Тип поезда:</label>
+            <select class="form-control" id="trainTypeSelect" name="train_type" onchange="showText();">
                 <option value="express">Экспресс</option>
                 <option value="local">Пригородный</option>
                 <option value="freight">Грузовой</option>
             </select>
         </div>
 
+        <div class="alert alert-dark" role="alert" id="price" style="margin-bottom: 5px;">
+            Стоимость поезда: {{ lastochka_price }}$
+        </div>
+        <script>
+            function showText() {
+              var selectValue = document.getElementById("trainTypeSelect").value;
+              var textToShow = document.getElementById("price");
+
+              if (selectValue === "express") {
+                textToShow.textContent = "Стоимость: " + "{{ lastochka_price }}" + "$";
+              } else if (selectValue === "local") {
+                textToShow.textContent = "Стоимость: " + "{{ ivolga_price }}" + "$";
+              } else if (selectValue === "freight") {
+                textToShow.textContent = "Стоимость: " + "{{ locomotive_price }}" + "$";
+              }
+            }
+        </script>
+
         <div class="form-group">
-            <label for="classSelect">Выберите линию:</label>
-            <select class="form-control" id="lineSelect" name="line">
+            <label for="lineSelect">Выберите линию:</label>
+            <select class="form-control" id="lineSelect" name="line"
+                    onchange="updateSecondSelect(); updateThirdSelect(); checkDuplicateSelection(); toggleButton();">
                 {% for line in lines %}
                 <option value="{{ line }}">{{ line }}</option>
                 {% endfor %}
             </select>
         </div>
-
         <div class="form-group">
-            <label for="classSelect">Выберите станцию отправления:</label>
-            <select class="form-control" id="stationFromSelect" name="station1">
-                {% for station in stations %}
-                <option value="{{ station }}">{{ station }}</option>
-                {% endfor %}
-            </select>
+            <label>Выберите начальную станцию: </label>
+            <select name="station1" class="form-control" id="secondSelect"
+                    onchange="checkDuplicateSelection();toggleButton();"></select>
         </div>
-
-        <div class="form-group">
-            <label for="classSelect">Выберите конечную станцию:</label>
-            <select class="form-control" id="stationToSelect" name="station1">
-                {% for station in stations %}
-                <option value="{{ station }}">{{ station }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="acceptRules" name="accept" onchange="toggleButton()">
-            <label class="form-check-label" for="acceptRules">Я подтверждаю покупку</label>
-        </div>
-
-        <button type="submit" class="btn btn-success" id="buyButton" style="display: none">Купить поезд</button>
         <script>
-            function toggleButton() {
-                var checkbox = document.getElementById('acceptRules');
-                var button = document.getElementById('buyButton');
+            function updateSecondSelect() {
+                var lineSelect = document.getElementById("lineSelect");
+                var secondSelect = document.getElementById("secondSelect");
+                secondSelect.innerHTML = ""; // Clear existing options
+                var stations = {{ line_to_stations | tojson }};
+                var selectedLine = lineSelect.value;
+                stations[selectedLine].forEach(function(station) {
+                    var option = document.createElement("option");
+                    option.text = station;
+                    secondSelect.add(option);
+                });
+            }
+            updateSecondSelect();
+        </script>
+        <div class="form-group">
+            <label>Выберите конечную станцию: </label>
+            <select name="station2" class="form-control" id="thirdSelect"
+                    onchange="checkDuplicateSelection();toggleButton();"></select>
+        </div>
+        <div class="alert alert-danger" id="duplicateAlert" style="display: none;" role="alert">
+            Выбранные станции совпадают! Пожалуйста, выберите разные станции!
+        </div>
+        <script>
+            function updateThirdSelect() {
+                var lineSelect = document.getElementById("lineSelect");
+                var thirdSelect = document.getElementById("thirdSelect");
+                thirdSelect.innerHTML = ""; // Clear existing options
+                var stations = {{ line_to_stations | tojson }};
+                var selectedLine = lineSelect.value;
+                stations[selectedLine].forEach(function(station) {
+                    var option = document.createElement("option");
+                    option.text = station;
+                    thirdSelect.add(option);
+                });
+            }
 
-                if (checkbox.checked) {
-                    button.style.display = 'block';
+            function checkDuplicateSelection() {
+                var secondValue = document.getElementById("secondSelect").value;
+                var thirdValue = document.getElementById("thirdSelect").value;
+                var duplicateAlert = document.getElementById("duplicateAlert");
+                if (secondValue === thirdValue) {
+                    duplicateAlert.style.display = "block";
                 } else {
-                    button.style.display = 'none';
+                    duplicateAlert.style.display = "none";
                 }
             }
+
+            updateThirdSelect();
+            checkDuplicateSelection();
         </script>
+
+
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
+                <use xlink:href="#info-fill"/>
+            </svg>
+            <div id="div_advice">
+                Выберите стоимость билета
+            </div>
+        </div>
+
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                 class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img"
+                 aria-label="Warning:">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            <div style="padding-left: 10px; font-size: 20px;">
+                Если поезд грузовой, то стоимость билета ни на что не повлияет!
+            </div>
+        </div>
 
         <div class="slider">
             <output for="fader" id="volume">10</output>
-            <input type="range" id="fader" min="10" max="450" value="10" step="10" oninput="outputUpdate(value)">
+            <input name="trip_cost" type="range" id="fader" min="10" max="450" value="10" step="10"
+                   oninput="outputUpdate(value)">
         </div>
         <script type="text/javascript">
             function outputUpdate(vol) {
@@ -86,7 +160,52 @@
             }
         </script>
 
+        <div class="form-group">
+            <div class="alert alert-danger" id="problemAlert" style="display: none;" role="alert">
+                Покупка невозможна: есть неразрешённые конфликты!
+            </div>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="acceptRules" name="accept" onchange="toggleButton()">
+            <label class="form-check-label" for="acceptRules">Я подтверждаю покупку</label>
+        </div>
+        <button type="submit" class="btn btn-success" id="buyButton" style="display: none">Купить поезд</button>
+        <script>
+            function toggleButton() {
+                var checkbox = document.getElementById('acceptRules');
+                var button = document.getElementById('buyButton');
+                var problemAlert = document.getElementById('problemAlert');
+                var secondValue = document.getElementById("secondSelect").value;
+                var thirdValue = document.getElementById("thirdSelect").value;
+
+                if (checkbox.checked && secondValue != thirdValue) {
+                    button.style.display = 'block';
+                } else {
+                    button.style.display = 'none';
+                }
+
+                if (secondValue != thirdValue) {
+                    problemAlert.style.display = 'none';
+                }
+                else {
+                    problemAlert.style.display = 'block';
+                }
+            }
+            toggleButton();
+        </script>
     </form>
 </div>
+{% else %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+         class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </svg>
+    <div id="div1">
+        Вы не вошли в аккаунт!
+    </div>
+</div>
+{% endif %}
 </body>
 {% endblock %}

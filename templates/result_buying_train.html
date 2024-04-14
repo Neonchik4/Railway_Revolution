@@ -1,14 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
+<head>
+    <style>
+        h5 {
+            margin-top: 5px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
 <body>
-<div class="card">
-  <img src="..." class="card-img-top" alt="...">
+<div style="display: flex; justify-content: center;">
+    <div class="card" style="width: 300px;">
+        {% if train_type == "Пригородный" %}
+            <img src="/static/img/ivolga.jpg" style="width: 300px; height: 205px;" class="card-img-top" alt="...">
+            <h5 class="card-title">Куплен поезд типа "Пригородный"</h5>
+        {% elif train_type == "Экспресс" %}
+            <img src="/static/img/lastochka.jpg" style="width: 300px; height: 205px;" class="card-img-top" alt="...">
+            <h5 class="card-title">Куплен поезд типа "Экспресс"</h5>
+        {% else %}
+            <img src="/static/img/locomotive.jpg" style="width: 300px; height: 205px;" class="card-img-top" alt="...">
+            <h5 class="card-title">Куплен поезд типа "Грузовой"</h5>
+        {% endif %}
+        <div class="card-body">
+            <ul class="list-group list-group-flush" style="font-size: 20px">
+                <p style="margin-top: -20px;" class="card-text">Поздравляем с покупкой! Ознакомьтесь с данными купленного поезда, а затем можете возвращаться к своим делам.</p>
+                <li class="list-group-item">Тип поезда: {{ train_type }}</li>
+                <li class="list-group-item">Линия поезда: {{ line }}</li>
+                <li class="list-group-item">Поезд будет ходить между станциями <h4 style="color: red">{{ station1 }}</h4> и <h4 style="color: red">{{ station2 }}</h4></li>
+                <li class="list-group-item">Стоимость билета: {{ trip_cost }}</li>
 
-  <div class="card-body">
-    <h5 class="card-title">{{}}</h5>
-    <p class="card-text">Небольшой пример текста, основанного на названии карточки и составляющего основную часть содержимого карточки.</p>
-    <a href="#" class="btn btn-primary">Иди куда-нибудь</a>
-  </div>
+                <div style="width: 270px; margin-top: 5px; margin-left: -10px;">
+                    <a href="/buying_train" class="btn btn-primary" style="margin-bottom: 5px;">Купить ещё поезд</a>
+                    <a href="/train_info" class="btn btn-warning">Узнать характеристику поездов</a>
+                </div>
+            </ul>
+        </div>
+    </div>
 </div>
 </body>
 {% endblock %}

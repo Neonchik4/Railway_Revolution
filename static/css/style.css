@@ -4,6 +4,11 @@ h1 {
 #div1 {
     font-size: 28px
 }
+#div_advice {
+    font-size: 22px;
+    padding-left: 10px;
+    width: 440px;
+}
 #res_div {
     font-size: 20px;
 }
@@ -30,6 +35,8 @@ form.buying_train_form {
 	border-radius: 8px;
 	width: 410px;
 	height: 18px;
+	margin-top: 35px;
+	margin-bottom: 20px;
 }
 
 output {
