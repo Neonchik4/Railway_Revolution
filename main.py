@@ -107,7 +107,6 @@ def buying_train():
             train_type = 'Грузовой'
 
         update_money()
-        print(CONST_PARAMS)
         line = params['line']
         station1 = params['station1']
         station2 = params['station2']
