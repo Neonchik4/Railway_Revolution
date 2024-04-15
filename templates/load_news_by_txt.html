@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body>
+<div style="text-align: align; display: flex; justify-content: center;">
+    <h1>Загрузка новости</h1>
+</div>
+<form method="post" enctype="multipart/form-data" class="login_form">
+    <div style="font-size: 25px;">Загрузите файл для добавления новости</div>
+    <div class="alert alert-primary" role="alert" style="margin-top: 5px;">
+        <ul style="margin-left: -25px; font-size: 20px;">
+            <li>В первой строчке файла должно быть название новости;</li>
+            <li>Во второй строчке указать личная ли новость или нет (если да: True или 1, если нет: False или 0);</li>
+            <li>В последующих строчках надо написать какую-нибудь новость;</li>
+        </ul>
+    </div>
+
+    <input style="" type="file" name="file">
+    <br>
+    <input class="btn btn-success btn-lg" style="margin-top: 14px; border-radius: 15px;" type="submit" value="Submit">
+</form>
+</body>
+{% endblock %}

@@ -10,6 +10,8 @@ from data import db_session, news_api, news_resources
 from data.users import User
 import sqlite3
 import pygame
+import os
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -58,6 +60,22 @@ def scheme():
     return render_template('scheme.html', **CONST_PARAMS, title='Схема')
 
 
+@app.route("/load_news_by_txt", methods=['GET', 'POST'])
+def load_news_by_txt():
+    if request.method == "GET":
+        return render_template('load_news_by_txt.html', **CONST_PARAMS, title='Загрузка новостей')
+    else:  # TODO: доделать
+        file = request.files['file']
+        if file:
+            file.save(os.path.join('uploads', file.filename))
+            with open(os.path.join('uploads', file.filename), mode='r', encoding='utf-8') as f:
+                content = [i.rstrip() for i in f.readlines()]
+                for line in content:
+                    print(line)
+            os.remove(os.path.join('uploads', file.filename))
+            return 'File uploaded successfully!'
+
+
 @app.route('/train_info')
 def train_info():
     if current_user.is_authenticated:
@@ -93,7 +111,6 @@ def buying_train():
                                is_authenticated=is_authenticated, title='Покупка поезда')
     elif request.method == 'POST':
         params = dict(request.form)
-        print(params)
         train_type = params['train_type']
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
