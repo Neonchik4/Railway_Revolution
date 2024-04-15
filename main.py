@@ -62,6 +62,7 @@ def scheme():
 @app.route("/load_news_by_txt", methods=['GET', 'POST'])
 def load_news_by_txt():
     if request.method == "GET":
+        print('FFFDFFF')
         return render_template('load_news_by_txt.html', **CONST_PARAMS, title='Загрузка новостей')
     else:  # TODO: доделать
         file = request.files['file']
@@ -199,7 +200,7 @@ def login():
 def news():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        news = db_sess.query(News)
+        news = db_sess.query(News).filter((News.user == current_user) | (News.is_private == 0))
     else:
         news = db_sess.query(News).filter(News.is_private != 1)
     return render_template("news.html", **CONST_PARAMS, news=news, title='Новости')
