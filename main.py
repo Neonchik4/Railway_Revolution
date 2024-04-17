@@ -36,6 +36,10 @@ def update_money():
 class Company:
     def __init__(self):
         self.money = 70000000  # TODO: Сделать сохранение в БД
+        self.cur = sqlite3.connect('db/Railway_data.db').cursor()
+        self.cur.execute(f"""UPDATE money
+                        SET cash = {self.money}
+                        WHERE id = 1""")
 
     def money_beautiful_format(self):
         # красивый ответ -> ans
