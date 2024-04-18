@@ -10,6 +10,7 @@ from data import db_session, news_api, news_resources
 from data.users import User
 import sqlite3
 import pygame
+import os
 
 app = Flask(__name__)
 api = Api(app)
@@ -62,6 +63,57 @@ def scheme():
     return render_template('scheme.html', **CONST_PARAMS, title='Схема')
 
 
+@app.route("/load_news_by_txt", methods=['GET', 'POST'])
+def load_news_by_txt():
+    if request.method == "GET":
+        print('FFFDFFF')
+        return render_template('load_news_by_txt.html', **CONST_PARAMS, title='Загрузка новостей')
+    else:  # TODO: доделать
+        file = request.files['file']
+        if file:
+            file.save(os.path.join('uploads', file.filename))
+            with open(os.path.join('uploads', file.filename), mode='r', encoding='utf-8') as f:
+                content = [i.rstrip() for i in f.readlines()]
+                pustishka = False
+                if len(content) >= 3:
+                    if content[1].lower() in ('true', '0', '1', 'false'):
+                        db_sess = db_session.create_session()
+                        news = News()
+                        news.title = content[0].lower().capitalize()  # str
+                        news.content = "\n".join(content[2:])  # str
+                        # bool
+                        if content[1].lower() in ('true', '1'):
+                            news.is_private = True
+                        else:
+                            news.is_private = False
+                        current_user.news.append(news)
+                        db_sess.merge(current_user)
+                        db_sess.commit()
+                    else:
+                        pustishka = True
+                else:
+                    pustishka = True
+
+                if pustishka:
+                    db_sess = db_session.create_session()
+                    news = News()
+                    news.title = "Странная новость..."  # str
+                    st_temp = """Была добавлена странная новость, которая как-то перекочевала из текстого 
+                                    файла. Увы. \n Странные новости появляются, когда что-то идёт не так. \n 
+                                    Смотрите правила отправки в форме..."""
+                    news.content = st_temp  # str
+                    news.is_private = True  # bool
+                    current_user.news.append(news)
+                    db_sess.merge(current_user)
+                    db_sess.commit()
+
+                # на случай тестирования
+                # for line in content:
+                #     print(line)
+            os.remove(os.path.join('uploads', file.filename))
+            return redirect('/news')
+
+
 @app.route('/train_info')
 def train_info():
     if current_user.is_authenticated:
@@ -97,7 +149,6 @@ def buying_train():
                                is_authenticated=is_authenticated, title='Покупка поезда')
     elif request.method == 'POST':
         params = dict(request.form)
-        print(params)
         train_type = params['train_type']
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
@@ -153,7 +204,7 @@ def login():
 def news():
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        news = db_sess.query(News).filter(News.is_private != 1)
+        news = db_sess.query(News).filter((News.user == current_user) | (News.is_private == 0))
     else:
         news = db_sess.query(News).filter(News.is_private != 1)
     return render_template("news.html", **CONST_PARAMS, news=news, title='Новости')
@@ -166,9 +217,9 @@ def add_news():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         news = News()
-        news.title = form.title.data
-        news.content = form.content.data
-        news.is_private = form.is_private.data
+        news.title = form.title.data  # str
+        news.content = form.content.data  # str
+        news.is_private = form.is_private.data  # bool
         current_user.news.append(news)
         db_sess.merge(current_user)
         db_sess.commit()
