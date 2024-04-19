@@ -1,38 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Line</title>
-</head>
-<body>
-{% if line_name %}
-<h1>{{ line_name }}</h1>
-<table border="1">
-    <tr>
-        <th>Station</th>
-        <th>Weather</th>
-        <th>Temperature</th>
-    </tr>
-    {% for station in stations %}
-    <tr>
-        <td>{{ station }}</td>
-        <td>{{ station_weather[station][0] }}</td>
-        <td>{{ station_weather[station][1] }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<form action="/" method="GET">
-    <select name="line">
-        {% for line in lines %}
-        <option value="{{ line[0] }}">{{ line[0] }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Select Line">
-</form>
-{% endif %}
-</body>
+{% for item in stations_data%}
+<div class="col-md6 border rounded" style="margin-top: 8px;">
+    <div style="font-size: 21px; padding-bottom: 3px;">
+        {{item.name}}
+    </div>
+    <div>
+        Автор - {{item.stations}}, Дата написания - {{item.name}}
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

@@ -6,6 +6,7 @@ from flask_restful import abort, Api
 from forms.news import NewsForm
 from forms.user import RegisterForm, LoginForm
 from data.news import News
+from data.lines import Lines
 from data import db_session, news_api, news_resources
 from data.users import User
 import sqlite3
@@ -262,7 +263,7 @@ def edit_news(id):
                                           ).first()
         if news:
             form.title.data = news.title
-            form.content.data = news.content
+            form.content.data = news.stations
             form.is_private.data = news.is_private
         else:
             abort(404)
@@ -273,7 +274,7 @@ def edit_news(id):
                                           ).first()
         if news:
             news.title = form.title.data
-            news.content = form.content.data
+            news.stations = form.content.data
             news.is_private = form.is_private.data
             db_sess.commit()
             return redirect('/news')
