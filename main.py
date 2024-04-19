@@ -11,7 +11,7 @@ from data.users import User
 import sqlite3
 import pygame
 import os
-
+import requests
 
 # TODO: сделать главную страницу по адресу "/"
 # TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
@@ -25,6 +25,7 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+API_YANDEX_WEATHER = "ff05ee3f-99c0-44c1-8bd4-e46d648aed4b"
 
 
 def maker_money_beautiful_format(number):
@@ -62,6 +63,25 @@ def main_page():
     return render_template('main_page.html', **CONST_PARAMS, title='Главная')
 
 
+def get_weather(station_name):
+    url = f'https://api.weather.yandex.ru/v2/forecast?lat=55.75396&lon=37.620393&extra=true'
+    headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    fact = data['fact']
+    weather_description = fact['condition']
+    temperature = fact['temp']
+    return weather_description, temperature
+
+
+@app.route('/list_stations')
+def list_stations():
+    db_sess = db_session.create_session()
+    stations_data = db_sess.query(Lines)
+    return render_template('list_stations.html', **CONST_PARAMS, title='Список станций',
+                           stations_data=stations_data)
+
+
 @app.route('/scheme')
 def scheme():
     return render_template('scheme.html', **CONST_PARAMS, title='Схема')
@@ -70,7 +90,6 @@ def scheme():
 @app.route("/load_news_by_txt", methods=['GET', 'POST'])
 def load_news_by_txt():
     if request.method == "GET":
-        print('FFFDFFF')
         return render_template('load_news_by_txt.html', **CONST_PARAMS, title='Загрузка новостей')
     else:  # TODO: доделать
         file = request.files['file']
