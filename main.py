@@ -12,6 +12,14 @@ import sqlite3
 import pygame
 import os
 
+
+# TODO: сделать главную страницу по адресу "/"
+# TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
+#  список списков, добавить к каждой станции данные по погоде через яндекс API и сохранить картинку станции в
+#  какую-нибудь папку и отрисовать их
+# TODO: сделать кнопку "список поездов" - вывести все поезда в виде горизонатльных карточек с картинками и данными по
+#  поездам
+
 app = Flask(__name__)
 api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -36,11 +44,8 @@ def update_money():
 
 class Company:
     def __init__(self):
-        self.money = 70000000  # TODO: Сделать сохранение в БД
         self.cur = sqlite3.connect('db/Railway_data.db').cursor()
-        self.cur.execute(f"""UPDATE money
-                        SET cash = {self.money}
-                        WHERE id = 1""")
+        self.money = int(self.cur.execute(f"""SELECT cash FROM money WHERE id = 1""").fetchall()[0][0])
 
     def money_beautiful_format(self):
         # красивый ответ -> ans
@@ -150,6 +155,7 @@ def buying_train():
     elif request.method == 'POST':
         params = dict(request.form)
         train_type = params['train_type']
+        cur = sqlite3.connect('db/Railway_data.db').cursor()
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
             company.money -= LASTOCHKA_PRICE
@@ -161,6 +167,10 @@ def buying_train():
             company.money -= LOCOMOTIVE_PRICE
             train_type = 'Грузовой'
 
+        print(company.money)
+        cur.execute(f"""UPDATE money
+                        SET cash = {company.money}
+                        WHERE id = 1""")
         update_money()
         line = params['line']
         station1 = params['station1']
