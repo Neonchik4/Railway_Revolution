@@ -58,7 +58,8 @@ def update_money():
 
 class Company:
     def __init__(self):
-        self.money = 70000000
+        self.cur = sqlite3.connect('db/Railway_data.db').cursor()
+        self.money = int(self.cur.execute(f"""SELECT cash FROM money WHERE id = 1""").fetchall()[0][0])
 
     def money_beautiful_format(self):
         # красивый ответ -> ans
@@ -203,6 +204,7 @@ def buying_train():
     elif request.method == 'POST':
         params = dict(request.form)
         train_type = params['train_type']
+        cur = sqlite3.connect('db/Railway_data.db').cursor()
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
             company.money -= LASTOCHKA_PRICE
@@ -214,6 +216,9 @@ def buying_train():
             company.money -= LOCOMOTIVE_PRICE
             train_type = 'Грузовой'
 
+        cur.execute(f"""UPDATE money
+                        SET cash = {company.money}
+                        WHERE id = 1""")
         update_money()
         line = params['line']
         station1 = params['station1']
