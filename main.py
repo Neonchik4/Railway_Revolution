@@ -6,11 +6,14 @@ from flask_restful import abort, Api
 from forms.news import NewsForm
 from forms.user import RegisterForm, LoginForm
 from data.news import News
+from data.lines import Lines
 from data import db_session, news_api, news_resources
 from data.users import User
 import sqlite3
 import pygame
 import os
+import requests
+import json
 
 
 # TODO: сделать главную страницу по адресу "/"
@@ -25,6 +28,17 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+API_YANDEX_WEATHER = "ff05ee3f-99c0-44c1-8bd4-e46d648aed4b"
+API_GEOCODE_MAPS = "40d1649f-0493-4b70-98ba-98533de7710b"
+
+
+def get_coords_of_object(name_object):
+    url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_GEOCODE_MAPS}&geocode={name_object}&format=json"
+    response = requests.get(url)
+    response_json = response.json()
+    pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
+    lon, lat = pos.split(" ")
+    return lat, lon
 
 
 # @app.route('/station_info')
@@ -74,6 +88,42 @@ def main_page():
     return render_template('main_page.html', **CONST_PARAMS, title='Главная')
 
 
+def get_weather(name_object):
+    coords = get_coords_of_object(name_object=name_object)
+    url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=true'
+    headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    fact = data['fact']
+    # weather_description = fact['condition']
+    # temperature = fact['temp']
+    # return weather_description, temperature
+    return data
+
+
+@app.route('/list_stations')
+def list_stations():
+    db_sess = db_session.create_session()
+    stations_data = db_sess.query(Lines)
+    conn = sqlite3.connect('db/Railway_data.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT name FROM lines')
+    lines = cursor.fetchall()
+    conn.close()
+    return render_template('list_stations.html', **CONST_PARAMS, title='Список станций',
+                           stations_data=stations_data, lines=lines)
+
+
+@app.route('/list_stations/<line_name>')
+def show_line_info(line_name):
+    conn = sqlite3.connect('db/Railway_data.db')
+    cursor = conn.cursor()
+    stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
+    conn.close()
+    return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
+                           line_name=line_name, stations=result)
+
+
 @app.route('/scheme')
 def scheme():
     return render_template('scheme.html', **CONST_PARAMS, title='Схема')
@@ -82,7 +132,6 @@ def scheme():
 @app.route("/load_news_by_txt", methods=['GET', 'POST'])
 def load_news_by_txt():
     if request.method == "GET":
-        print('FFFDFFF')
         return render_template('load_news_by_txt.html', **CONST_PARAMS, title='Загрузка новостей')
     else:  # TODO: доделать
         file = request.files['file']
@@ -265,7 +314,7 @@ def edit_news(id):
                                           ).first()
         if news:
             form.title.data = news.title
-            form.content.data = news.content
+            form.content.data = news.stations
             form.is_private.data = news.is_private
         else:
             abort(404)
@@ -276,7 +325,7 @@ def edit_news(id):
                                           ).first()
         if news:
             news.title = form.title.data
-            news.content = form.content.data
+            news.stations = form.content.data
             news.is_private = form.is_private.data
             db_sess.commit()
             return redirect('/news')
@@ -389,6 +438,9 @@ CONST_PARAMS = {'money': company.money_beautiful_format(),
                 'lastochka_price': maker_money_beautiful_format(LASTOCHKA_PRICE),
                 'ivolga_price': maker_money_beautiful_format(IVOLGA_PRICE),
                 'locomotive_price': maker_money_beautiful_format(LOCOMOTIVE_PRICE)}
+print(get_coords_of_object('Москва'))
+print(get_weather('Москва'))
+json.dump(get_weather('Москва'), open('weather.json', mode='w', encoding='utf-8'), ensure_ascii=False)
 
 if __name__ == '__main__':
     main()
