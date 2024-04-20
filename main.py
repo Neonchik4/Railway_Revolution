@@ -216,6 +216,7 @@ def buying_train():
             company.money -= LOCOMOTIVE_PRICE
             train_type = 'Грузовой'
 
+        print(company.money)
         cur.execute(f"""UPDATE money
                         SET cash = {company.money}
                         WHERE id = 1""")
