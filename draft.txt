@@ -1,0 +1,8 @@
+def maker_money_beautiful_format() - создание читаемого ответа
+def update_money() - запись денег в программе
+def main_page() - главная страница
+def scheme() - схема
+def train_info() - характеристика поездов
+def resources() - ресурсы
+def buying_train() - покупка поездов с выбором стоимости билета и станций отправления
+def news() - вывод всех новостей, которые происходили за время игры
