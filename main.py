@@ -27,6 +27,17 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+# @app.route('/station_info')
+# def resources():
+#     if current_user.is_authenticated:
+#         is_authenticated = True
+#     else:
+#         is_authenticated = False
+#     return render_template('station_info.html', **CONST_PARAMS, name_line=LINES,
+#                            lines=dic_line_to_stations,
+#                            is_authenticated=is_authenticated, title='Виды ресурсов')
+
+
 def maker_money_beautiful_format(number):
     # красивый ответ -> ans
     ans = ""
@@ -155,7 +166,8 @@ def buying_train():
     elif request.method == 'POST':
         params = dict(request.form)
         train_type = params['train_type']
-        cur = sqlite3.connect('db/Railway_data.db').cursor()
+        con = sqlite3.connect('db/Railway_data.db')
+        cur = con.cursor()
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
             company.money -= LASTOCHKA_PRICE
@@ -172,10 +184,14 @@ def buying_train():
                         SET cash = {company.money}
                         WHERE id = 1""")
         update_money()
+        # имя поезда, пробел, № id
         line = params['line']
         station1 = params['station1']
         station2 = params['station2']
         trip_cost = params['trip_cost']
+        cur.execute(f"""INSERT INTO trains(name, station1, station2, price, line_id)
+                        VALUES('{train_type} №{line}', '{station1}', '{station2}', {trip_cost}, '{line}')""")
+        con.commit()
         return render_template('result_buying_train.html', train_type=train_type, line=line,
                                station1=station1, **CONST_PARAMS, title='Покупка поезда',
                                station2=station2, trip_cost=trip_cost)
@@ -342,6 +358,8 @@ cursor_sql1 = con1.cursor()
 LINES = [i[0] for i in cursor_sql1.execute('SELECT name FROM LINES').fetchall()]
 dic_line_to_stations = {i[0]: i[1].split(', ') for i in
                         cursor_sql1.execute('SELECT name, stations FROM LINES').fetchall()}
+print(LINES)
+print(dic_line_to_stations)
 
 RESOURCES = ['Нефтепродукты', "Строительные материалы", "Химическая продукция", "Металлопрокат",
              "Контейнеры", "Уголь", "Нефть", "Песок", "Глина", "Древесина", "Сталь", "Алюминий", "Зерно", "Сахар",
