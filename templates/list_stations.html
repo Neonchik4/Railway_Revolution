@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% for item in stations_data%}
-<div class="col-md6 border rounded" style="margin-top: 8px;">
-    <div style="font-size: 21px; padding-bottom: 3px;">
-        {{item.name}}
-    </div>
-    <div>
-        Автор - {{item.stations}}, Дата написания - {{item.name}}
-    </div>
+{% if line_name %}
+    <h1>Информация о станциях линии {{ line_name }}</h1>
+{% else %}
+<h1 style="display:flex; justify-content:center;">Информация по станциям каждой линии</h1>
+<div class="col-md6 border rounded" style="margin-top: 6px; padding: 5px; width: auto; display:flex; justify-content:center;">
+    {% for item in lines %}
+        <a style="margin: 5px; background: #67AEFE;" href="/list_stations/{{ item[0] }}" class="btn btn-small">
+            Посмтотреть станции {{ item[0] }}
+        </a>
+    {% endfor %}
 </div>
-{% endfor %}
+{% endif %}
+
 {% endblock %}
