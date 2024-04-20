@@ -110,7 +110,7 @@ def show_line_info(line_name):
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
     conn.close()
     return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
-                           line_name=line_name, stations=result)
+                           line_name=line_name, stations=stations)
 
 
 @app.route('/scheme')
@@ -204,7 +204,8 @@ def buying_train():
     elif request.method == 'POST':
         params = dict(request.form)
         train_type = params['train_type']
-        cur = sqlite3.connect('db/Railway_data.db').cursor()
+        conn1 = sqlite3.connect('db/Railway_data.db')
+        cur = conn1.cursor()
         # Заметка: переводим тип поезда в кириллицу
         if train_type == 'express':
             company.money -= LASTOCHKA_PRICE
@@ -220,6 +221,7 @@ def buying_train():
         cur.execute(f"""UPDATE money
                         SET cash = {company.money}
                         WHERE id = 1""")
+        conn1.commit()
         update_money()
         line = params['line']
         station1 = params['station1']
