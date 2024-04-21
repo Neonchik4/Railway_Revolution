@@ -121,7 +121,7 @@ def show_line_info(line_name):
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
     conn.close()
     return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
-                           line_name=line_name, stations=result)
+                           line_name=line_name, stations=stations)
 
 
 @app.route('/scheme')
