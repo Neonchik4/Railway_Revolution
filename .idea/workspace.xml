@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3321375c-23aa-4c94-8e5a-6bd59df4323e" name="Changes" comment="deleted files">
-      <change beforePath="$PROJECT_DIR$/Railway Revolution.pptx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/abc" beforeDir="false" />
+    <list default="true" id="3321375c-23aa-4c94-8e5a-6bd59df4323e" name="Changes" comment="unv files">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,12 +43,16 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="HARD" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;Neonchik4&quot;
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "history": [
+    {
+      "assignee": "Neonchik4"
+    }
+  ],
+  "lastFilter": {
+    "assignee": "Neonchik4"
   }
-}</component>
+}]]></component>
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
@@ -204,22 +207,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711306625595</updated>
-    </task>
-    <task id="LOCAL-00021" summary="changed names of nav">
-      <option name="closed" value="true" />
-      <created>1711906590243</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1711906590243</updated>
-    </task>
-    <task id="LOCAL-00022" summary="1">
-      <option name="closed" value="true" />
-      <created>1712518415919</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1712518415919</updated>
     </task>
     <task id="LOCAL-00023" summary="added 5 buttons">
       <option name="closed" value="true" />
@@ -597,7 +584,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713686449972</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="unv files">
+      <option name="closed" value="true" />
+      <created>1713686616223</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1713686616223</updated>
+    </task>
+    <task id="LOCAL-00071" summary="unv files">
+      <option name="closed" value="true" />
+      <created>1713686656420</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1713686656420</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -645,7 +648,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="I create a legend in db" />
     <MESSAGE value="scheme.html" />
     <MESSAGE value="CONST_PARAMS and fixed some bugs" />
     <MESSAGE value="Reformat file names" />
@@ -670,6 +672,7 @@
     <MESSAGE value="deleted .idea" />
     <MESSAGE value=".gitignore" />
     <MESSAGE value="deleted files" />
-    <option name="LAST_COMMIT_MESSAGE" value="deleted files" />
+    <MESSAGE value="unv files" />
+    <option name="LAST_COMMIT_MESSAGE" value="unv files" />
   </component>
 </project>
