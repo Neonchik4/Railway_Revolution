@@ -2,14 +2,27 @@
 
 {% block content %}
 {% if line_name %}
+<div style="display: flex; justify-content: center;">
     <h1>Информация о станциях линии {{ line_name }}</h1>
+</div>
+{% for item in stations_data %}
+<div style="display: flex; justify-content: center; font-size: 23px;">
+    <div class="col-md6 border rounded" style="margin-top: 6px; padding: 5px; width: 500px;">
+        <div style="margin-top: 5px; margin-bottom: 5px;">Станция: {{ item["station"] }}</div>
+        <div style="margin-top: 5px; margin-bottom: 5px;">Температура: {{ item["temp"] }}°C</div>
+        <div style="margin-top: 5px; margin-bottom: 5px;">Ощущается как: {{ item["feels_like"] }}°C</div>
+    </div>
+</div>
+
+{% endfor %}
 {% else %}
 <h1 style="display:flex; justify-content:center;">Информация по станциям каждой линии</h1>
-<div class="col-md6 border rounded" style="margin-top: 6px; padding: 5px; width: auto; display:flex; justify-content:center;">
+<div class="col-md6 border rounded"
+     style="margin-top: 6px; padding: 5px; width: auto; display:flex; justify-content:center;">
     {% for item in lines %}
-        <a style="margin: 5px; background: #67AEFE;" href="/list_stations/{{ item[0] }}" class="btn btn-small">
-            Посмтотреть станции {{ item[0] }}
-        </a>
+    <a style="margin: 5px; background: #67AEFE;" href="/list_stations/{{ item[0] }}" class="btn btn-small">
+        Посмтотреть станции {{ item[0] }}
+    </a>
     {% endfor %}
 </div>
 {% endif %}

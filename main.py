@@ -15,7 +15,6 @@ import os
 import requests
 import json
 
-
 # TODO: сделать главную страницу по адресу "/"
 # TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
 #  список списков, добавить к каждой станции данные по погоде через яндекс API и сохранить картинку станции в
@@ -39,6 +38,15 @@ def get_coords_of_object(name_object):
     pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
     lon, lat = pos.split(" ")
     return lat, lon
+
+
+def get_weather(name_object):
+    coords = get_coords_of_object(name_object=name_object)
+    url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=false&lang="ru_RU"'
+    headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    return data['fact']
 
 
 def maker_money_beautiful_format(number):
@@ -77,19 +85,6 @@ def main_page():
     return render_template('main_page.html', **CONST_PARAMS, title='Главная')
 
 
-def get_weather(name_object):
-    coords = get_coords_of_object(name_object=name_object)
-    url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=true'
-    headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
-    response = requests.get(url, headers=headers)
-    data = response.json()
-    fact = data['fact']
-    # weather_description = fact['condition']
-    # temperature = fact['temp']
-    # return weather_description, temperature
-    return data
-
-
 @app.route('/list_stations')
 def list_stations():
     db_sess = db_session.create_session()
@@ -104,13 +99,37 @@ def list_stations():
 
 
 @app.route('/list_stations/<line_name>')
-def show_line_info(line_name):
+def show_line_info(line_name):  # TODO: доделать html файл и форму added_form
     conn = sqlite3.connect('db/Railway_data.db')
     cursor = conn.cursor()
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
     conn.close()
+    form_station_info = {"image_path": "", 'station': "", "temp": "", "feels_like": "","icon": "",
+                         "condition": "", "wind_speed": ""}
+
+    stations_data = []
+    for el_station in stations:
+        weather_data = get_weather(el_station)
+        image_path = ""
+        temperature = weather_data['temp']
+        feels_like = weather_data["feels_like"]
+        icon = weather_data["icon"]
+        condition = weather_data["condition"]
+        wind_speed = weather_data['wind_speed']
+
+        # делаем форму
+        added_form = form_station_info.copy()
+        added_form['image_path'] = image_path
+        added_form['station'] = el_station
+        added_form['temp'] = temperature
+        added_form['feels_like'] = feels_like
+        added_form["icon"] = icon
+        added_form["condition"] = condition
+        added_form["wind_speed"] = wind_speed
+        stations_data.append(added_form)
+
     return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
-                           line_name=line_name, stations=stations)
+                           line_name=line_name, stations=stations, stations_data=stations_data)
 
 
 @app.route('/scheme')
@@ -422,9 +441,6 @@ CONST_PARAMS = {'money': company.money_beautiful_format(),
                 'lastochka_price': maker_money_beautiful_format(LASTOCHKA_PRICE),
                 'ivolga_price': maker_money_beautiful_format(IVOLGA_PRICE),
                 'locomotive_price': maker_money_beautiful_format(LOCOMOTIVE_PRICE)}
-print(get_coords_of_object('Москва'))
-print(get_weather('Москва'))
-json.dump(get_weather('Москва'), open('weather.json', mode='w', encoding='utf-8'), ensure_ascii=False)
 
 if __name__ == '__main__':
     main()
