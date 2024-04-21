@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Записи в блоге</h1>
+{% for item in buying_info%}
+<div class="col-md6 border rounded" style="margin-top: 8px;">
+    <div class="border border-primary">
+        <h2>{{item.name}}</h2>
+    </div>
+    <div style="font-size: 21px; padding-bottom: 3px;">
+        {{item.station1}}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
