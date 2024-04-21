@@ -6,7 +6,6 @@ from flask_restful import abort, Api
 from forms.news import NewsForm
 from forms.user import RegisterForm, LoginForm
 from data.news import News
-from data.trains import Trains
 from data.lines import Lines
 from data import db_session, news_api, news_resources
 from data.users import User
@@ -40,6 +39,17 @@ def get_coords_of_object(name_object):
     pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
     lon, lat = pos.split(" ")
     return lat, lon
+
+
+# @app.route('/station_info')
+# def resources():
+#     if current_user.is_authenticated:
+#         is_authenticated = True
+#     else:
+#         is_authenticated = False
+#     return render_template('station_info.html', **CONST_PARAMS, name_line=LINES,
+#                            lines=dic_line_to_stations,
+#                            is_authenticated=is_authenticated, title='Виды ресурсов')
 
 
 def maker_money_beautiful_format(number):
@@ -76,20 +86,6 @@ class Company:
 @app.route('/')
 def main_page():
     return render_template('main_page.html', **CONST_PARAMS, title='Главная')
-
-
-@app.route('/list_trains')
-def list_trains():
-    # buying_info = [i[0] for i in cursor_sql1.execute('SELECT * FROM TRAINS').fetchall()]
-    # print(buying_info)
-    db_sess = db_session.create_session()
-    buying_info = db_sess.query(Trains)
-    if current_user.is_authenticated:
-        is_authenticated = True
-    else:
-        is_authenticated = False
-    return render_template('list_trains.html', **CONST_PARAMS, buying_info=buying_info,
-                           is_authenticated=is_authenticated, title='Список поездов')
 
 
 def get_weather(name_object):
@@ -225,28 +221,25 @@ def buying_train():
         if train_type == 'express':
             company.money -= LASTOCHKA_PRICE
             train_type = 'Экспресс'
-            id = len(cur.execute(f"SELECT name FROM TRAINS WHERE name like 'Экспресс%' ").fetchall())
         elif train_type == 'local':
             company.money -= IVOLGA_PRICE
             train_type = 'Пригородный'
-            id = len(cur.execute(f"SELECT name FROM TRAINS WHERE name like 'Пригородный%' ").fetchall())
         else:
             company.money -= LOCOMOTIVE_PRICE
             train_type = 'Грузовой'
-            id = len(cur.execute(f"SELECT name FROM TRAINS WHERE name like 'Грузовой%' ").fetchall())
 
+        print(company.money)
         cur.execute(f"""UPDATE money
                         SET cash = {company.money}
                         WHERE id = 1""")
         update_money()
         # имя поезда, пробел, № id
-        h = {'МЦД-1': 1, 'МЦД-2': 2, 'МЦД-3': 3, 'МЦД-4': 4, 'МЦК': 5}
         line = params['line']
         station1 = params['station1']
         station2 = params['station2']
         trip_cost = params['trip_cost']
         cur.execute(f"""INSERT INTO trains(name, station1, station2, price, line_id)
-                        VALUES('{train_type} №{id + 1}', '{station1}', '{station2}', {trip_cost}, '{h[line]}')""")
+                        VALUES('{train_type} №{line}', '{station1}', '{station2}', {trip_cost}, '{line}')""")
         con.commit()
         return render_template('result_buying_train.html', train_type=train_type, line=line,
                                station1=station1, **CONST_PARAMS, title='Покупка поезда',
@@ -414,6 +407,8 @@ cursor_sql1 = con1.cursor()
 LINES = [i[0] for i in cursor_sql1.execute('SELECT name FROM LINES').fetchall()]
 dic_line_to_stations = {i[0]: i[1].split(', ') for i in
                         cursor_sql1.execute('SELECT name, stations FROM LINES').fetchall()}
+print(LINES)
+print(dic_line_to_stations)
 
 RESOURCES = ['Нефтепродукты', "Строительные материалы", "Химическая продукция", "Металлопрокат",
              "Контейнеры", "Уголь", "Нефть", "Песок", "Глина", "Древесина", "Сталь", "Алюминий", "Зерно", "Сахар",
