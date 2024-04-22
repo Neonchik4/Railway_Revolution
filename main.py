@@ -99,7 +99,7 @@ def list_stations():
 
 
 @app.route('/list_stations/<line_name>')
-def show_line_info(line_name):  # TODO: доделать html файл и форму added_form
+def show_line_info(line_name):  # TODO: доделать центрирование
     conn = sqlite3.connect('db/Railway_data.db')
     cursor = conn.cursor()
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
