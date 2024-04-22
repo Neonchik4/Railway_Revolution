@@ -112,8 +112,38 @@ def show_line_info(line_name):  # TODO: доделать html файл и фор
                      "snow-showers": "снегопад",
                      "hail": 'град', "thunderstorm": "гроза", "thunderstorm-with-rain": "дождь с грозой",
                      "thunderstorm-with-hail": "гроза с градом"}
+    wind_dir_ru = {
+        'N': 'С',
+        'S': 'Ю',
+        'W': 'З',
+        'E': 'В',
+        'NW': 'СЗ',
+        'NE': 'СВ',
+        'SE': 'ЮВ',
+        'SW': 'ЮЗ',
+        'C': 'C'
+    }
+    to_wind_dir_ru_eng = {
+        'N': 'S',
+        'S': 'N',
+        'W': 'E',
+        'E': 'W',
+        'NW': 'SE',
+        'NE': 'SW',
+        'SE': 'NW',
+        'SW': 'NE',
+        'С': 'Ю',
+        'Ю': 'С',
+        'З': 'В',
+        'В': 'З',
+        'СЗ': 'ЮВ',
+        'СВ': 'ЮЗ',
+        'ЮВ': 'СЗ',
+        'ЮЗ': 'СВ',
+        'C': 'штиль',
+    }
     form_station_info = {"image_path": "", 'station': "", "temp": "", "feels_like": "", "icon": "",
-                         "condition": "", "wind_speed": ""}
+                         "condition": "", "wind_speed": "", "pressure_mm": "", "wind_dir_from": "", "wind_dir_to": ""}
 
     stations_data = []
     for el_station in stations:
@@ -124,6 +154,10 @@ def show_line_info(line_name):  # TODO: доделать html файл и фор
         icon = weather_data["icon"]
         condition = conditions_ru[weather_data["condition"]]
         wind_speed = weather_data['wind_speed']
+        pressure_mm = weather_data['pressure_mm']
+        print(weather_data['wind_dir'])
+        wind_dir_from = wind_dir_ru[weather_data['wind_dir'].upper()]
+        wind_dir_to = to_wind_dir_ru_eng[wind_dir_ru[weather_data['wind_dir'].upper()]]
 
         # делаем форму
         added_form = form_station_info.copy()
@@ -134,6 +168,9 @@ def show_line_info(line_name):  # TODO: доделать html файл и фор
         added_form["icon"] = icon
         added_form["condition"] = condition
         added_form["wind_speed"] = wind_speed
+        added_form['pressure_mm'] = pressure_mm
+        added_form['wind_dir_from'] = wind_dir_from
+        added_form['wind_dir_to'] = wind_dir_to
         stations_data.append(added_form)
 
     return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
@@ -188,9 +225,6 @@ def load_news_by_txt():
                     db_sess.merge(current_user)
                     db_sess.commit()
 
-                # на случай тестирования
-                # for line in content:
-                #     print(line)
             os.remove(os.path.join('uploads', file.filename))
             return redirect('/news')
 
@@ -244,7 +278,6 @@ def buying_train():
             company.money -= LOCOMOTIVE_PRICE
             train_type = 'Грузовой'
 
-        print(company.money)
         cur.execute(f"""UPDATE money
                         SET cash = {company.money}
                         WHERE id = 1""")
