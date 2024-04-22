@@ -104,7 +104,15 @@ def show_line_info(line_name):  # TODO: доделать html файл и фор
     cursor = conn.cursor()
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
     conn.close()
-    form_station_info = {"image_path": "", 'station': "", "temp": "", "feels_like": "","icon": "",
+    conditions_ru = {"clear": "ясно", "partly-cloudy": "малооблачно", "cloudy": "облачно с прояснениями",
+                     "overcast": "пасмурно",
+                     "light-rain": "небольшой дождь", "rain": "дождь", "heavy-rain": "сильный дождь",
+                     "showers": 'ливень',
+                     "wet-snow": "дождь со снегом", "light-snow": "небольшой снег", "snow": 'снег',
+                     "snow-showers": "снегопад",
+                     "hail": 'град', "thunderstorm": "гроза", "thunderstorm-with-rain": "дождь с грозой",
+                     "thunderstorm-with-hail": "гроза с градом"}
+    form_station_info = {"image_path": "", 'station': "", "temp": "", "feels_like": "", "icon": "",
                          "condition": "", "wind_speed": ""}
 
     stations_data = []
@@ -114,7 +122,7 @@ def show_line_info(line_name):  # TODO: доделать html файл и фор
         temperature = weather_data['temp']
         feels_like = weather_data["feels_like"]
         icon = weather_data["icon"]
-        condition = weather_data["condition"]
+        condition = conditions_ru[weather_data["condition"]]
         wind_speed = weather_data['wind_speed']
 
         # делаем форму
