@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; width: 170px; margin-left: calc(50% - 85px); margin-top: 20px; padding-bottom: 10px; ">
+            <div style="display: flex; width: 170px; margin-left: calc(50% - 85px); margin-top: 25px; padding-bottom: 10px; ">
                 <div style="width: 40px; height: 40px; margin-top: 7px;">
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"
@@ -64,8 +64,8 @@
                 <div style="font-size: 17px; margin-top: 15px; padding-left: 2px;">мм рт. ст.</div>
             </div>
 
-            <div style="display: flex; margin-left: 33%; margin-top: 20px; padding-bottom: 10px;">
-                <div style="width: 40px; height: 40px; margin-top: 7px;">
+            <div style="display: flex; width: 130px; margin-left: calc(50% - 65px); padding-left: -5px; height: 60px; justify-content: center;">
+                <div style="width: 50px; height: 50px; margin-top: 7px;">
                     <svg viewBox="-33 0 512 512" xmlns="http://www.w3.org/2000/svg">
                         <path d="m124.023438 176.84375-74.523438-54.265625c-3.398438-2.472656-4.144531-7.234375-1.671875-10.632813 2.472656-3.398437 7.234375-4.148437 10.632813-1.671874l74.523437 54.261718c3.398437 2.476563 4.148437 7.234375 1.671875 10.636719-2.472656 3.394531-7.230469 4.144531-10.632812 1.671875zm0 0"
                               fill="#525468"/>
@@ -106,8 +106,11 @@
                 </div>
             </div>
 
-            <span class="high-low">{{ item["temp"] }}°/{{ item["feels_like"] }}°</span>
-            <div style="display: flex; margin-left: 28%; margin-top: -20px; padding-bottom: 10px;">
+            <div style="display: flex; width: 90px; margin-left: calc(50% - 45px); margin-bottom: -15px;justify-content: center">
+                <span class="high-low">{{ item["temp"] }}°/{{ item["feels_like"] }}°</span>
+            </div>
+
+            <div style="display: flex; width: 200px; margin-left: calc(48% - 100px); padding-bottom: 10px;padding-top: -10px;">
                 <svg id="windy_cloud_svg" class="windy-cloud"
                      style="background-color: grey; border-radius: 6px; width: 70px;"
                      xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
