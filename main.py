@@ -14,6 +14,8 @@ import pygame
 import os
 import requests
 import json
+from aiohttp import ClientSession
+
 
 # TODO: сделать главную страницу по адресу "/"
 # TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
@@ -40,13 +42,14 @@ def get_coords_of_object(name_object):
     url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_GEOCODE_MAPS}&geocode={name_object}&format=json"
     response = requests.get(url)
     response_json = response.json()
+    json.dump(response_json, open('weather.json', 'w', encoding='utf-8'))
     pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
     lon, lat = pos.split(" ")
     return lat, lon
 
 
 def get_weather(name_object):
-    coords = get_coords_of_object(name_object=name_object)
+    coords = get_coords_of_object(name_object=f"ст. {name_object}")
     url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=false&lang="ru_RU"'
     headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
     response = requests.get(url, headers=headers)
