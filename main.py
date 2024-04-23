@@ -160,7 +160,6 @@ def show_line_info(line_name):
         condition = conditions_ru[weather_data["condition"]]
         wind_speed = weather_data['wind_speed']
         pressure_mm = weather_data['pressure_mm']
-        print(weather_data['wind_dir'])
         wind_dir_from = wind_dir_ru[weather_data['wind_dir'].upper()]
         wind_dir_to = to_wind_dir_ru_eng[wind_dir_ru[weather_data['wind_dir'].upper()]]
 
