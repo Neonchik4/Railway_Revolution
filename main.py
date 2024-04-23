@@ -27,7 +27,7 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-API_YANDEX_WEATHER = "ff05ee3f-99c0-44c1-8bd4-e46d648aed4b"
+API_YANDEX_WEATHER = "3c8c04bf-7266-4c93-9405-d8ee4f7350a2"
 API_GEOCODE_MAPS = "40d1649f-0493-4b70-98ba-98533de7710b"
 
 
@@ -99,7 +99,7 @@ def list_stations():
 
 
 @app.route('/list_stations/<line_name>')
-def show_line_info(line_name):  # TODO: доделать центрирование
+def show_line_info(line_name):  # TODO: доделать html файл и форму added_form
     conn = sqlite3.connect('db/Railway_data.db')
     cursor = conn.cursor()
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
