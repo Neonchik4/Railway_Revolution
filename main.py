@@ -104,7 +104,7 @@ def list_stations():
 
 
 @app.route('/list_stations/<line_name>')
-def show_line_info(line_name):  # TODO: доделать центрирование
+def show_line_info(line_name):
     conn = sqlite3.connect('db/Railway_data.db')
     cursor = conn.cursor()
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
@@ -191,7 +191,7 @@ def scheme():
 def load_news_by_txt():
     if request.method == "GET":
         return render_template('load_news_by_txt.html', **CONST_PARAMS, title='Загрузка новостей')
-    else:  # TODO: доделать
+    else:
         file = request.files['file']
         if file:
             file.save(os.path.join('uploads', file.filename))
