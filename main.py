@@ -14,6 +14,7 @@ import pygame
 import os
 import requests
 import json
+import asyncio
 from aiohttp import ClientSession
 
 
@@ -29,27 +30,52 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 API_YANDEX_WEATHER = "3c8c04bf-7266-4c93-9405-d8ee4f7350a2"
 API_GEOCODE_MAPS = "40d1649f-0493-4b70-98ba-98533de7710b"
 
 
-def get_coords_of_object(name_object):
+async def get_coords_of_object(name_object):
     url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_GEOCODE_MAPS}&geocode={name_object}&format=json"
-    response = requests.get(url)
-    response_json = response.json()
-    json.dump(response_json, open('weather.json', 'w', encoding='utf-8'))
-    pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
-    lon, lat = pos.split(" ")
-    return lat, lon
+    async with ClientSession() as session:
+        async with session.get(url) as response:
+            response_json = await response.json()
+            pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
+            lon, lat = pos.split(" ")
+            return lat, lon
 
 
-def get_weather(name_object):
-    coords = get_coords_of_object(name_object=f"ст. {name_object}")
+async def get_weather(name_object):
+    coords = await get_coords_of_object(name_object=name_object)
     url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=false&lang="ru_RU"'
     headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
-    response = requests.get(url, headers=headers)
-    data = response.json()
-    return data['fact']
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            data = await response.json()
+            return data['fact']
+
+
+async def asnc_stations_data(stations):
+    tasks = []
+    for station in stations:
+        tasks.append(asyncio.create_task(get_weather(station)))
+
+    results = await asyncio.gather(*tasks)
+    return results
+
+
+@app.route('/list_stations/<line_name>')
+def show_line_info(line_name):
+    conn = sqlite3.connect('db/Railway_data.db')
+    cursor = conn.cursor()
+    stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
+    conn.close()
+    stations_data = asyncio.run(asnc_stations_data(stations))
+    for i in stations_data:
+        print(i)
+
+    return stations_data
 
 
 def maker_money_beautiful_format(number):
@@ -101,82 +127,82 @@ def list_stations():
                            stations_data=stations_data, lines=lines)
 
 
-@app.route('/list_stations/<line_name>')
-def show_line_info(line_name):
-    conn = sqlite3.connect('db/Railway_data.db')
-    cursor = conn.cursor()
-    stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
-    conn.close()
-    conditions_ru = {"clear": "ясно", "partly-cloudy": "малооблачно", "cloudy": "облачно с прояснениями",
-                     "overcast": "пасмурно",
-                     "light-rain": "небольшой дождь", "rain": "дождь", "heavy-rain": "сильный дождь",
-                     "showers": 'ливень',
-                     "wet-snow": "дождь со снегом", "light-snow": "небольшой снег", "snow": 'снег',
-                     "snow-showers": "снегопад",
-                     "hail": 'град', "thunderstorm": "гроза", "thunderstorm-with-rain": "дождь с грозой",
-                     "thunderstorm-with-hail": "гроза с градом"}
-    wind_dir_ru = {
-        'N': 'С',
-        'S': 'Ю',
-        'W': 'З',
-        'E': 'В',
-        'NW': 'СЗ',
-        'NE': 'СВ',
-        'SE': 'ЮВ',
-        'SW': 'ЮЗ',
-        'C': 'C'
-    }
-    to_wind_dir_ru_eng = {
-        'N': 'S',
-        'S': 'N',
-        'W': 'E',
-        'E': 'W',
-        'NW': 'SE',
-        'NE': 'SW',
-        'SE': 'NW',
-        'SW': 'NE',
-        'С': 'Ю',
-        'Ю': 'С',
-        'З': 'В',
-        'В': 'З',
-        'СЗ': 'ЮВ',
-        'СВ': 'ЮЗ',
-        'ЮВ': 'СЗ',
-        'ЮЗ': 'СВ',
-        'C': 'штиль',
-    }
-    form_station_info = {"image_path": "", 'station': "", "temp": "", "feels_like": "", "icon": "",
-                         "condition": "", "wind_speed": "", "pressure_mm": "", "wind_dir_from": "", "wind_dir_to": ""}
-
-    stations_data = []
-    for el_station in stations:
-        weather_data = get_weather(el_station)
-        image_path = ""
-        temperature = weather_data['temp']
-        feels_like = weather_data["feels_like"]
-        icon = weather_data["icon"]
-        condition = conditions_ru[weather_data["condition"]]
-        wind_speed = weather_data['wind_speed']
-        pressure_mm = weather_data['pressure_mm']
-        wind_dir_from = wind_dir_ru[weather_data['wind_dir'].upper()]
-        wind_dir_to = to_wind_dir_ru_eng[wind_dir_ru[weather_data['wind_dir'].upper()]]
-
-        # делаем форму
-        added_form = form_station_info.copy()
-        added_form['image_path'] = image_path
-        added_form['station'] = el_station
-        added_form['temp'] = temperature
-        added_form['feels_like'] = feels_like
-        added_form["icon"] = icon
-        added_form["condition"] = condition
-        added_form["wind_speed"] = wind_speed
-        added_form['pressure_mm'] = pressure_mm
-        added_form['wind_dir_from'] = wind_dir_from
-        added_form['wind_dir_to'] = wind_dir_to
-        stations_data.append(added_form)
-
-    return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
-                           line_name=line_name, stations=stations, stations_data=stations_data)
+# @app.route('/list_stations/<line_name>')
+# def show_line_info(line_name):
+#     conn = sqlite3.connect('db/Railway_data.db')
+#     cursor = conn.cursor()
+#     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
+#     conn.close()
+#     conditions_ru = {"clear": "ясно", "partly-cloudy": "малооблачно", "cloudy": "облачно с прояснениями",
+#                      "overcast": "пасмурно",
+#                      "light-rain": "небольшой дождь", "rain": "дождь", "heavy-rain": "сильный дождь",
+#                      "showers": 'ливень',
+#                      "wet-snow": "дождь со снегом", "light-snow": "небольшой снег", "snow": 'снег',
+#                      "snow-showers": "снегопад",
+#                      "hail": 'град', "thunderstorm": "гроза", "thunderstorm-with-rain": "дождь с грозой",
+#                      "thunderstorm-with-hail": "гроза с градом"}
+#     wind_dir_ru = {
+#         'N': 'С',
+#         'S': 'Ю',
+#         'W': 'З',
+#         'E': 'В',
+#         'NW': 'СЗ',
+#         'NE': 'СВ',
+#         'SE': 'ЮВ',
+#         'SW': 'ЮЗ',
+#         'C': 'C'
+#     }
+#     to_wind_dir_ru_eng = {
+#         'N': 'S',
+#         'S': 'N',
+#         'W': 'E',
+#         'E': 'W',
+#         'NW': 'SE',
+#         'NE': 'SW',
+#         'SE': 'NW',
+#         'SW': 'NE',
+#         'С': 'Ю',
+#         'Ю': 'С',
+#         'З': 'В',
+#         'В': 'З',
+#         'СЗ': 'ЮВ',
+#         'СВ': 'ЮЗ',
+#         'ЮВ': 'СЗ',
+#         'ЮЗ': 'СВ',
+#         'C': 'штиль',
+#     }
+#     form_station_info = {"image_path": "", 'station': "", "temp": "", "feels_like": "", "icon": "",
+#                          "condition": "", "wind_speed": "", "pressure_mm": "", "wind_dir_from": "", "wind_dir_to": ""}
+#
+#     stations_data = []
+#     for el_station in stations:
+#         weather_data = get_weather(el_station)
+#         image_path = ""
+#         temperature = weather_data['temp']
+#         feels_like = weather_data["feels_like"]
+#         icon = weather_data["icon"]
+#         condition = conditions_ru[weather_data["condition"]]
+#         wind_speed = weather_data['wind_speed']
+#         pressure_mm = weather_data['pressure_mm']
+#         wind_dir_from = wind_dir_ru[weather_data['wind_dir'].upper()]
+#         wind_dir_to = to_wind_dir_ru_eng[wind_dir_ru[weather_data['wind_dir'].upper()]]
+#
+#         # делаем форму
+#         added_form = form_station_info.copy()
+#         added_form['image_path'] = image_path
+#         added_form['station'] = el_station
+#         added_form['temp'] = temperature
+#         added_form['feels_like'] = feels_like
+#         added_form["icon"] = icon
+#         added_form["condition"] = condition
+#         added_form["wind_speed"] = wind_speed
+#         added_form['pressure_mm'] = pressure_mm
+#         added_form['wind_dir_from'] = wind_dir_from
+#         added_form['wind_dir_to'] = wind_dir_to
+#         stations_data.append(added_form)
+#
+#     return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
+#                            line_name=line_name, stations=stations, stations_data=stations_data)
 
 
 @app.route('/scheme')
