@@ -17,7 +17,6 @@ import json
 import asyncio
 from aiohttp import ClientSession
 
-
 # TODO: сделать главную страницу по адресу "/"
 # TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
 #  список списков, добавить к каждой станции данные по погоде через яндекс API и сохранить картинку станции в
@@ -34,6 +33,46 @@ asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 API_YANDEX_WEATHER = "3c8c04bf-7266-4c93-9405-d8ee4f7350a2"
 API_GEOCODE_MAPS = "40d1649f-0493-4b70-98ba-98533de7710b"
+CONDITIONS_RU = {"clear": "ясно", "partly-cloudy": "малооблачно", "cloudy": "облачно с прояснениями",
+                 "overcast": "пасмурно",
+                 "light-rain": "небольшой дождь", "rain": "дождь", "heavy-rain": "сильный дождь",
+                 "showers": 'ливень',
+                 "wet-snow": "дождь со снегом", "light-snow": "небольшой снег", "snow": 'снег',
+                 "snow-showers": "снегопад",
+                 "hail": 'град', "thunderstorm": "гроза", "thunderstorm-with-rain": "дождь с грозой",
+                 "thunderstorm-with-hail": "гроза с градом"}
+WIND_DIR_RU = {
+    'N': 'С',
+    'S': 'Ю',
+    'W': 'З',
+    'E': 'В',
+    'NW': 'СЗ',
+    'NE': 'СВ',
+    'SE': 'ЮВ',
+    'SW': 'ЮЗ',
+    'C': 'C'
+}
+TO_WIND_DIR_RU_ENG = {
+    'N': 'S',
+    'S': 'N',
+    'W': 'E',
+    'E': 'W',
+    'NW': 'SE',
+    'NE': 'SW',
+    'SE': 'NW',
+    'SW': 'NE',
+    'С': 'Ю',
+    'Ю': 'С',
+    'З': 'В',
+    'В': 'З',
+    'СЗ': 'ЮВ',
+    'СВ': 'ЮЗ',
+    'ЮВ': 'СЗ',
+    'ЮЗ': 'СВ',
+    'C': 'штиль',
+}
+FROM_STATION_INFO = {"image_path": "", 'station': "", "temp": "", "feels_like": "", "icon": "",
+                     "condition": "", "wind_speed": "", "pressure_mm": "", "wind_dir_from": "", "wind_dir_to": ""}
 
 
 async def get_coords_of_object(name_object):
@@ -72,10 +111,35 @@ def show_line_info(line_name):
     stations = cursor.execute(f"""SELECT STATIONS FROM LINES WHERE NAME="{line_name}" """).fetchone()[0].split(', ')
     conn.close()
     stations_data = asyncio.run(asnc_stations_data(stations))
-    for i in stations_data:
-        print(i)
+    new_form_stations_data = []
 
-    return stations_data
+    for index, weather_data in enumerate(stations_data):
+        image_path = ""
+        temperature = weather_data['temp']
+        feels_like = weather_data["feels_like"]
+        icon = weather_data["icon"]
+        condition = CONDITIONS_RU[weather_data["condition"]]
+        wind_speed = weather_data['wind_speed']
+        pressure_mm = weather_data['pressure_mm']
+        wind_dir_from = WIND_DIR_RU[weather_data['wind_dir'].upper()]
+        wind_dir_to = TO_WIND_DIR_RU_ENG[WIND_DIR_RU[weather_data['wind_dir'].upper()]]
+
+        # делаем форму
+        added_form = FROM_STATION_INFO.copy()
+        added_form['image_path'] = image_path
+        added_form['station'] = stations[index]
+        added_form['temp'] = temperature
+        added_form['feels_like'] = feels_like
+        added_form["icon"] = icon
+        added_form["condition"] = condition
+        added_form["wind_speed"] = wind_speed
+        added_form['pressure_mm'] = pressure_mm
+        added_form['wind_dir_from'] = wind_dir_from
+        added_form['wind_dir_to'] = wind_dir_to
+        new_form_stations_data.append(added_form)
+
+    return render_template('list_stations.html', **CONST_PARAMS, title=line_name,
+                           line_name=line_name, stations=stations, stations_data=new_form_stations_data)
 
 
 def maker_money_beautiful_format(number):
