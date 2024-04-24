@@ -22,17 +22,12 @@ import json
 # TODO: сделать кнопку "список поездов" - вывести все поезда в виде горизонатльных карточек с картинками и данными по
 #  поездам
 
-# TODO: напиться кофе -
-#       сделать центрирование в list_stations.html +
-#       переделать версию асинхрона с хабра
-#       продумать логику поездов и прибавки денег
-
 app = Flask(__name__)
 api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-API_YANDEX_WEATHER = "ff05ee3f-99c0-44c1-8bd4-e46d648aed4b"
+API_YANDEX_WEATHER = "3c8c04bf-7266-4c93-9405-d8ee4f7350a2"
 API_GEOCODE_MAPS = "40d1649f-0493-4b70-98ba-98533de7710b"
 
 
