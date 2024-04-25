@@ -17,7 +17,6 @@ import json
 import asyncio
 from aiohttp import ClientSession
 
-
 # TODO: сделать главную страницу по адресу "/"
 # TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
 #  список списков, добавить к каждой станции данные по погоде через яндекс API и сохранить картинку станции в
@@ -115,7 +114,8 @@ def show_line_info(line_name):
     new_form_stations_data = []
 
     for index, weather_data in enumerate(stations_data):
-        image_path = ""
+        image_path = f"/static/img/stations/станция_{stations[index]}.jpg".replace('%20', ' ')
+        print(image_path)
         temperature = weather_data['temp']
         feels_like = weather_data["feels_like"]
         icon = weather_data["icon"]
@@ -575,6 +575,7 @@ CONST_PARAMS = {'money': company.money_beautiful_format(),
                 'lastochka_price': maker_money_beautiful_format(LASTOCHKA_PRICE),
                 'ivolga_price': maker_money_beautiful_format(IVOLGA_PRICE),
                 'locomotive_price': maker_money_beautiful_format(LOCOMOTIVE_PRICE)}
+
 
 if __name__ == '__main__':
     main()

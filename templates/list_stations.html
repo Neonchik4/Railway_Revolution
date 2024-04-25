@@ -21,8 +21,11 @@
 {% for item in stations_data %}
 <div style="display: flex; justify-content: center; font-size: 23px;">
     <div class="col-md6 border rounded" style="margin-top: 6px; padding: 5px; width: 500px;">
-        <div style="margin-bottom: 7px; display: flex; justify-content: center;">
+        <div style="margin-bottom: 7px; width: 370px; display: flex; justify-content: center; background-color: #8BDA54; border-radius: 12px; margin-left: auto; margin-right: auto;">
             <h1>{{ item["station"] }}</h1>
+        </div>
+        <div style="display: flex; justify-content: center; margin-left: auto; margin-right: auto; margin-bottom: 5px;">
+            <img src="{{ item['image_path'] }}" alt=":(" style="width: 400px; height: 350px;">
         </div>
 
         <article class="box weather" style="margin-left: auto; margin-right: auto; align-items: center;">
