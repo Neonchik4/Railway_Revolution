@@ -496,7 +496,8 @@ def main():
 
     t = Thread(target=new_update_money)
     t.start()
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
 
 company = Company()
