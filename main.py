@@ -75,14 +75,13 @@ FROM_STATION_INFO = {"image_path": "", 'station': "", "temp": "", "feels_like": 
                      "condition": "", "wind_speed": "", "pressure_mm": "", "wind_dir_from": "", "wind_dir_to": ""}
 
 
-async def get_coords_of_object(name_object):
+def get_coords_of_object(name_object):
     url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_GEOCODE_MAPS}&geocode={name_object}&format=json"
-    async with ClientSession() as session:
-        async with session.get(url) as response:
-            response_json = await response.json()
-            pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
-            lon, lat = pos.split(" ")
-            return lat, lon
+    response = requests.get(url)
+    response_json = response.json()
+    pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
+    lon, lat = pos.split(" ")
+    return lat, lon
 
 
 async def get_weather(name_object):
@@ -175,13 +174,20 @@ class Company:
 
 @app.route('/')
 def main_page():
-    if current_user.is_authenticated:
-        is_authenticated = True
-    else:
-        is_authenticated = False
+    return render_template('main_page.html', **CONST_PARAMS, title='Главная')
 
-    return render_template('main_page.html', **CONST_PARAMS, title='Главная',
-                           is_authenticated=is_authenticated)
+
+def get_weather(name_object):
+    coords = get_coords_of_object(name_object=name_object)
+    url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=true'
+    headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    fact = data['fact']
+    # weather_description = fact['condition']
+    # temperature = fact['temp']
+    # return weather_description, temperature
+    return data
 
 
 @app.route('/list_stations')
@@ -245,6 +251,9 @@ def load_news_by_txt():
                     db_sess.merge(current_user)
                     db_sess.commit()
 
+                # на случай тестирования
+                # for line in content:
+                #     print(line)
             os.remove(os.path.join('uploads', file.filename))
             return redirect('/news')
 
@@ -303,10 +312,14 @@ def buying_train():
                         WHERE id = 1""")
         conn1.commit()
         update_money()
+        # имя поезда, пробел, № id
         line = params['line']
         station1 = params['station1']
         station2 = params['station2']
         trip_cost = params['trip_cost']
+        cur.execute(f"""INSERT INTO trains(name, station1, station2, price, line_id)
+                        VALUES('{train_type} №{line}', '{station1}', '{station2}', {trip_cost}, '{line}')""")
+        con.commit()
         return render_template('result_buying_train.html', train_type=train_type, line=line,
                                station1=station1, **CONST_PARAMS, title='Покупка поезда',
                                station2=station2, trip_cost=trip_cost)
