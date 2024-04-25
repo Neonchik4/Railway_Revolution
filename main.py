@@ -380,7 +380,7 @@ def edit_news(id):
                                           ).first()
         if news:
             form.title.data = news.title
-            form.content.data = news.stations
+            form.content.data = news.content
             form.is_private.data = news.is_private
         else:
             abort(404)
@@ -391,7 +391,7 @@ def edit_news(id):
                                           ).first()
         if news:
             news.title = form.title.data
-            news.stations = form.content.data
+            news.content = form.content.data
             news.is_private = form.is_private.data
             db_sess.commit()
             return redirect('/news')
