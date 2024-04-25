@@ -18,6 +18,9 @@ import json
 import asyncio
 import aiohttp
 from aiohttp import ClientSession
+from threading import Thread
+import time
+import random
 
 
 # TODO: сделать главную страницу по адресу "/"
@@ -471,6 +474,16 @@ def bad_request(_):
     return make_response(jsonify({'error': 'Bad Request'}), 400)
 
 
+def new_update_money():
+    while True:
+        con1 = sqlite3.connect('db/Railway_data.db')
+        cursor_sql1 = con1.cursor()
+        trains = len(cursor_sql1.execute("SELECT NAME FROM TRAINS").fetchall())
+        company.money += sum([random.randint(50, 230) for _ in range(trains)])
+        update_money()
+        time.sleep(3)
+
+
 def main():
     db_session.global_init("db/Railway_data.db")
 
@@ -480,6 +493,9 @@ def main():
 
     # для одного объекта
     api.add_resource(news_resources.NewsResource, '/api/v2/news/<int:news_id>')
+
+    t = Thread(target=new_update_money)
+    t.start()
     app.run()
 
 
