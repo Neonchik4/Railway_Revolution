@@ -6,6 +6,7 @@ from flask_restful import abort, Api
 from forms.news import NewsForm
 from forms.user import RegisterForm, LoginForm
 from data.news import News
+from data.trains import Trains
 from data.lines import Lines
 from data import db_session, news_api, news_resources
 from data.users import User
@@ -15,7 +16,9 @@ import os
 import requests
 import json
 import asyncio
+import aiohttp
 from aiohttp import ClientSession
+
 
 # TODO: сделать главную страницу по адресу "/"
 # TODO: сделать кнопку "список станций" - т.е. вывести получить из БД все данные по станциям, затем превратить это в
@@ -75,13 +78,14 @@ FROM_STATION_INFO = {"image_path": "", 'station': "", "temp": "", "feels_like": 
                      "condition": "", "wind_speed": "", "pressure_mm": "", "wind_dir_from": "", "wind_dir_to": ""}
 
 
-def get_coords_of_object(name_object):
+async def get_coords_of_object(name_object):
     url = f"https://geocode-maps.yandex.ru/1.x/?apikey={API_GEOCODE_MAPS}&geocode={name_object}&format=json"
-    response = requests.get(url)
-    response_json = response.json()
-    pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
-    lon, lat = pos.split(" ")
-    return lat, lon
+    async with ClientSession() as session:
+        async with session.get(url) as response:
+            response_json = await response.json()
+            pos = response_json["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
+            lon, lat = pos.split(" ")
+            return lat, lon
 
 
 async def get_weather(name_object):
@@ -177,19 +181,6 @@ def main_page():
     return render_template('main_page.html', **CONST_PARAMS, title='Главная')
 
 
-def get_weather(name_object):
-    coords = get_coords_of_object(name_object=name_object)
-    url = f'https://api.weather.yandex.ru/v2/forecast?lat={coords[0]}&lon={coords[1]}&extra=true'
-    headers = {'X-Yandex-API-Key': API_YANDEX_WEATHER}
-    response = requests.get(url, headers=headers)
-    data = response.json()
-    fact = data['fact']
-    # weather_description = fact['condition']
-    # temperature = fact['temp']
-    # return weather_description, temperature
-    return data
-
-
 @app.route('/list_stations')
 def list_stations():
     db_sess = db_session.create_session()
@@ -201,6 +192,20 @@ def list_stations():
     conn.close()
     return render_template('list_stations.html', **CONST_PARAMS, title='Список станций',
                            stations_data=stations_data, lines=lines)
+
+
+@app.route('/list_trains')
+def list_trains():
+    # buying_info = [i[0] for i in cursor_sql1.execute('SELECT * FROM TRAINS').fetchall()]
+    # print(buying_info)
+    db_sess = db_session.create_session()
+    buying_info = db_sess.query(Trains)
+    if current_user.is_authenticated:
+        is_authenticated = True
+    else:
+        is_authenticated = False
+    return render_template('list_trains.html', **CONST_PARAMS, buying_info=buying_info,
+                           is_authenticated=is_authenticated, title='Список поездов')
 
 
 @app.route('/scheme')
@@ -319,7 +324,7 @@ def buying_train():
         trip_cost = params['trip_cost']
         cur.execute(f"""INSERT INTO trains(name, station1, station2, price, line_id)
                         VALUES('{train_type} №{line}', '{station1}', '{station2}', {trip_cost}, '{line}')""")
-        con.commit()
+        conn1.commit()
         return render_template('result_buying_train.html', train_type=train_type, line=line,
                                station1=station1, **CONST_PARAMS, title='Покупка поезда',
                                station2=station2, trip_cost=trip_cost)

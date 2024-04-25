@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+{% for item in buying_info%}
+<div class="col-md6 border rounded" style="margin-top: 8px;">
+    <div class="card mb-3" style="width: auto; height: 210px;;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                {% if 'Экспресс' in item.name %}
+                <img src="/static/img/lastochka.jpg" style="width: 300px; height: 205px;" class="img-fluid rounded-start"
+                     alt="...">
+                {% elif 'Пригородный' in item.name %}
+                <img src="/static/img/ivolga.jpg" style="width: 300px; height: 205px;" class="img-fluid rounded-start"
+                     alt="...">
+                {% elif 'Грузовой' in item.name %}
+                <img src="/static/img/locomotive.jpg" style="width: 300px; height: 205px;" class="img-fluid rounded-start"
+                     alt="...">
+                {%endif%}
+            </div>
+            <div class="col-md-8" style="margin-bottom: 4px;">
+                <div class="card-body">
+                    <h3 class="card-title">{{item.name}}</h3>
+                    <div style="font-size: 24px;" class="card-text">Данный поезд ходит между станциями {{item.station1}} и {{item.station2}}.</div>
+                    <div style="margin-top: 0px; font-size: 24px;">Стоимость поездки составляет {{item.price}} руб.</div>
+                    <div style="font-size: 24px; margin-bottom: 5px;">Интервал движения между станциями равен: {{item.travel_time}} сек.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+         class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </svg>
+    <div id="div1">
+        Вы не вошли в аккаунт!
+    </div>
+</div>
+{% endif %}
+{% endblock %}
